@@ -23,6 +23,8 @@
  * 
  * @since 1.0
  */
+
+
 if( !class_exists( 'OACBase' ) ) {
 	class OACBase {
 
@@ -48,6 +50,9 @@ if( !class_exists( 'OACBase' ) ) {
 			require_once( 'pchart/class/pDraw.class');
 			require_once( 'pchart/class/pImage.class');
 			require_once( 'pchart/class/pCache.class' );
+			
+			// WP_Scoper
+			require_once( 'scoper/wp-scoper.php' );
 			
 			// raphaeljs/gRapahel script setup.
 			wp_register_script( 'raphaeljs', plugins_url( 'js/raphael-min.js', __FILE__ ) );
@@ -85,6 +90,8 @@ if( !class_exists( 'OACBase' ) ) {
 
 // WordPress Hooks
 add_action( 'plugins_loaded', array( 'OACBase', 'oac_base_init' ), 9 );
+add_action( 'admin_menu', 'wp_scoper_admin_menu' );
+add_action( 'admin_init', 'wp_scoper_admin_init' );
 register_activation_hook( __FILE__, array( 'OACBase', 'oac_base_activate' ) );
 register_deactivation_hook( __FILE__, array( 'OACBase', 'oac_base_deactivate' ) );
 ?>
