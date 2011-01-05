@@ -89,8 +89,9 @@ if( !class_exists( 'OACBase' ) ) {
 
 // WordPress Hooks
 add_action( 'plugins_loaded', array( 'OACBase', 'oac_base_init' ), 9 );
-add_action( 'admin_menu', 'wp_scoper_admin_menu' );
-add_action( 'admin_init', 'wp_scoper_admin_init' );
 register_activation_hook( __FILE__, array( 'OACBase', 'oac_base_activate' ) );
 register_deactivation_hook( __FILE__, array( 'OACBase', 'oac_base_deactivate' ) );
+if( is_admin() ) require_once( 'scoper/wp-scoper-admin.php' );
+add_action( 'admin_menu', 'wp_scoper_admin_menu' );
+add_action( 'admin_init', 'wp_scoper_admin_init' );
 ?>
