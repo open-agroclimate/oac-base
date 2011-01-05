@@ -2,7 +2,9 @@
 
 class ArrayScoper {
 	public $error = array();
-
+	public $data;
+	public $raw_data;
+	
 	function ArrayScoper( $arr = null ) {
 		__construct( $arr );
 	}
@@ -54,7 +56,28 @@ class ArrayScoper {
 		return -1;
 	} //function get_depth
 
-	function &lookup_by_path( $path=null ) {
+	function lookup_by_path( $path=null ) {
+		$f = false;
+		if ( ! is_null( $path ) ) {
+			if ($path == '') {
+				return $this->data;
+			}
+			$arr = $this->data;
+			foreach ( explode('_', $path ) as $path_item ) {
+				if ( array_key_exists( $path_item, $arr ) ) {
+					$arr = $arr[ $path_item ];
+				} elseif ( array_key_exists( $path_item, $arr[ 'data' ] ) ) {
+					$arr = $arr[ 'data' ][ $path_item ];
+				} else {
+					return $f;
+				}
+			} // foreach ( ... )
+			return $arr;
+		} // if ( ! is_null ( $path ) )
+		return $f;
+	}
+
+	function &reference_by_path( $path=null ) {
 		$f = false;
 		if ( ! is_null( $path ) ) {
 			if ($path == '') {
@@ -73,7 +96,7 @@ class ArrayScoper {
 			return $arr;
 		} // if ( ! is_null ( $path ) )
 		return $f;
-	} //function lookup_by_path
+	} //function reference_by_path
 
 	function depth() {
 		$max_indentation = 1;
@@ -165,17 +188,57 @@ class ArrayScoper {
 		return true;
 	} //function add_depth
 
-	function add_entry( $parent_path, $data ) {
+	function is_duplicate( $parent, $data ) {
+		if ( ! is_array( $data ) ) {
+			$this->error[] = "The data needs to be an array.";
+			return false;
+		}
+		// For the root element! (BAAD LITTLE LANGUAGE)
+		if( array_key_exists( '__path', $parent ) ) {
+			if ( is_array( $parent['__path'] ) ) {
+				$parent = $parent['__path'];
+			}
+		}
+		// For normal entries
+		if ( array_key_exists ('data', $parent ) ) {
+			if (is_array( $parent['data'] ) ) {
+				$parent = $parent['data'];
+			}
+		}
+		
+		foreach( $parent as $p ) {
+			if( is_array($p) ) {
+				if( array_key_exists( '__path', $p ) )
+					$path = $p['__path'];
+					unset( $p['__path'] );
+					if ($p == $data ) {
+						return  $path;
+					}
+			}
+		}
+		return false; 	
+	}
+
+	function add_entry( $parent_path, $data, $fail_on_dup = false ) {
 		if ( ! is_array( $data ) ) {
 			$this->error[] = "The data needs to be an array.";
 			return false;
 		}
 
-		if ( $parent = &$this->lookup_by_path( $parent_path ) == false ) {
+		if ( ( $parent = &$this->reference_by_path( $parent_path ) ) == false ) {
 			$this->error[] = "Invalid parent path";
 			return false;
-		}
-		else {
+		} else {
+			//print_r( $parent );
+			if ( ($dup_path = $this->is_duplicate( $parent, $data )) !== false ) {
+				if( $fail_on_dup ) {
+					$this->error[] = "Invalid data: Duplicate data";
+					return false;
+				} else {
+					return $dup_path;
+				}
+			}
+			//print_r( $parent );
 			if ( $parent_path == '' )
 				$target_depth = 0;
 			else
@@ -199,7 +262,7 @@ class ArrayScoper {
 				$parent[ 'data' ][ $new_index ] = array_merge( $data, array( '__path'=>$new_path ) );
 			$this->raw_scope[ 'meta' ][ $target_depth ][ 'next_index' ]++;
 
-			return true;
+			return $new_path;
 		}
 	} //function add_entry
 
@@ -218,7 +281,7 @@ class ArrayScoper {
 			$child = $path[ 0 ];
 			$parent_path = '';
 		}
-		if ( $parent = &$this->lookup_by_path( $parent_path ) == false ) {
+		if ( $parent = &$this->reference_by_path( $parent_path ) == false ) {
 			$this->error[] = "Invalid path";
 			return false;
 		}
@@ -250,7 +313,7 @@ class ArrayScoper {
 			$child = $arr_path[ 0 ];
 			$parent_path = '';
 		}
-		if ( $parent = &$this->lookup_by_path( $parent_path ) == false ) {
+		if ( $parent = &$this->reference_by_path( $parent_path ) == false ) {
 			$this->error[] = "update_entry(): Invalid path";
 			return false;
 		}
@@ -284,7 +347,7 @@ class ArrayScoper {
 			else
 				return json_encode( $this->data );
 		} else {
-			$data = $this->lookup_by_path( $path );
+			$data = $this->reference_by_path( $path );
 			if( ! $data ) {
 				$this->error[] = "Invalid path selected";
 				return false;
@@ -294,7 +357,7 @@ class ArrayScoper {
 			else
 				return json_encode( $data );
 		}
-	} // function to_json()
+	} // function to_json
 } //class ArrayScoper
 
 
@@ -316,7 +379,7 @@ class ArrayScoper {
 )
 
 [ 1 ] => Array
-(
+(=
 'name' => 'County'
 'next_index' => 6
 'required' => array('name')
@@ -349,5 +412,20 @@ __path => '0'
 [ '4' ] => 'data'=>array('__path' => '1_4', name' => 'Athens-Clarke' )
 )
 )
+
+$ex_scope = new ArrayScoper();
+$ex_scope->add_depth('State',  array( 'long', 'short' ) );
+$ex_scope->add_depth('County', array( 'name' ) );
+$ex_scope->add_entry('',  array( 'long'=>'Florida', 'short'=>'FL' ) );
+$ex_scope->add_entry('',  array( 'long'=>'Georgia', 'short'=>'GA' ) );
+
+$ex_scope->add_entry( '0', array( 'name'=>'Alachua' ) );
+$ex_scope->add_entry( '0', array( 'name'=>'Marion' ) );
+$ex_scope->add_entry( '0', array( 'name'=>'Gilchrist' ) );
+$ex_scope->add_entry( '1', array( 'name'=>'Appling' ) );
+$ex_scope->add_entry( '1', array( 'name'=>'Athens-Clarke' ) );
+$ex_scope->add_entry( '0', array( 'name'=>'Manatee' ) );
+
+echo $ex_scope->to_json()."\n\n";
 */
 ?>

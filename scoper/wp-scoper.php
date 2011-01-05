@@ -18,6 +18,7 @@ function wp_scoper_admin_menu() {
 
 function wp_scoper_admin_page() {
 	$oac_scopes = get_option('oac_scopes', false );
+	$wps_page_uri = "tools.php?page=wp_scoper_listing";
 ?>
 	<div class="wrap">
 		<?php screen_icon(); ?>
@@ -48,7 +49,7 @@ function wp_scoper_admin_page() {
 			?>
 						<tr>
 							<td><?php echo $scope; ?></td>
-							<td>
+							<td rowspan="2">
 							<?php
 							 	if( count( $plugins ) > 0 ) {
 									sort( $plugins );
@@ -58,6 +59,14 @@ function wp_scoper_admin_page() {
 								}
 							?>
 							</td>
+						</tr>
+						<tr class="second">
+							<td>
+							<a href="<?php echo wp_nonce_url( $wps_page_uri . '&action=wps_edit&id='. utf8_uri_encode( $scope), 'edit-'.$scope); ?>" title="<?php _e( 'Edit this scope'); ?>"><?php _e( 'Edit' ); ?></a> 
+							<?php if( count( $plugins ) == 0 ) { ?>
+								| <a href="<?php echo wp_nonce_url( $wps_page_uri . '&action=wps_remove&id=' . utf8_uri_encode( $scope ), 'remove-'.$scope ); ?>" title="<?php _e( 'Remove this scope' ); ?>"><?php _e( 'Remove' ); ?></a></td>
+							<?php }	?>
+							<td></td>
 						</tr>
 			<?php
 					}
@@ -154,6 +163,10 @@ class WPScoper {
 	 */
 	public function to_json( $target=null, $with_meta = true ) {
 		return $this->data->to_json( $target, $with_meta );
+	}
+	
+	public function buildFromCSV()
+	{
 	}
 	
 }

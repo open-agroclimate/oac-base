@@ -24,7 +24,6 @@
  * @since 1.0
  */
 
-
 if( !class_exists( 'OACBase' ) ) {
 	class OACBase {
 
