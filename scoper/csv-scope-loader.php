@@ -69,23 +69,40 @@ class CSVScopeLoader {
 	 *
 	 * @since 1.0
 	 */
-	public function parse() {
+	public function parse( $meta_only = false ) {
 		$retval = true;
-		$handle = fopen( $this->file, "r" );
-		if( $handle !== false ) {
-		} else {
+		if( ( $handle = fopen( $this->file, "r" ) ) == false ) {
 			$this->error[] = "CSVScopeLoader Error: Could not open ".$this->file." for reading.";
 			return false;
 		}
-		if( $this->parse_head( $handle ) ) {
-			if( ! $this->parse_body( $handle ) ) {
+		if( $meta_only ) {
+			if( ! $this->parse_head( $handle ) ) {
 				$retval = false;
 			}
 		} else {
-			$retval = false;
+			if( $this->parse_head( $handle ) ) {
+				if( ! $this->parse_body( $handle ) ) {
+					$retval = false;
+				}
+			} else {
+				$retval = false;
+			}
 		}
 		fclose( $handle );
 		return $retval;
+	}
+
+	public function import_scope( $scope ) {
+		// First check to make sure it's the right type
+		if( is_object( $scope ) ) {
+			if( get_class( $scope ) != "ArrayScoper" )
+				return false;
+		} else {
+			return false;
+		}
+
+		$this->scope = $scope;
+		return true;
 	}
 
 
