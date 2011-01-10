@@ -42,12 +42,13 @@ function wp_scoper_admin_action_handler() {
 }
 
 function wp_scoper_admin_menu() {
-	add_management_page( 'WP Scoper', 'WP Scoper', 'manage_options', 'wp_scoper_listing', 'wp_scoper_admin_page' );
+	add_submenu_page( 'oac_menu', 'WP Scoper', 'WP Scoper', 'manage_options', 'wp_scoper_listing', 'wp_scoper_admin_page' );
+	//add_management_page( 'WP Scoper', 'WP Scoper', 'manage_options', 'wp_scoper_listing', 'wp_scoper_admin_page' );
 }
 
 function wp_scoper_admin_page() {
 	$oac_scopes = get_option('oac_scopes', false );
-	$wps_page_uri = "tools.php?page=wp_scoper_listing";
+	$wps_page_uri = "admin.php?page=wp_scoper_listing";
 ?>
 	<div class="wrap">
 		<?php screen_icon(); ?>
@@ -128,7 +129,6 @@ function wp_scoper_admin_page() {
 							<?php if( count( $plugins ) == 0 ) { ?>
 								| <a href="<?php echo wp_nonce_url( $wps_page_uri . '&action=wps_remove&id=' . utf8_uri_encode( $scope ), 'remove-'.$scope ); ?>" title="<?php _e( 'Remove this scope' ); ?>"><?php _e( 'Remove' ); ?></a></td>
 							<?php }	?>
-							<td></td>
 						</tr>
 			<?php
 					}

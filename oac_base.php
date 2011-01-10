@@ -84,6 +84,21 @@ if( !class_exists( 'OACBase' ) ) {
 		{
 			update_option( 'oac_base_info', false );
 		}
+
+		/***
+		 * Sets up the Open AgroClimate menu in WordPress
+		 *
+		 * @since 1.0
+		 */
+		static public function oac_base_admin_menu()
+		{
+			add_menu_page( 'Open AgroClimate', 'Open AgroClimate', 'manage_options', 'oac_menu', 'OACBase::oac_base_menu_page' );
+		}
+
+		static public function oac_base_admin_page()
+		{
+			echo "Under Development";
+		}
 	}
 }
 
@@ -92,6 +107,7 @@ add_action( 'plugins_loaded', array( 'OACBase', 'oac_base_init' ), 9 );
 register_activation_hook( __FILE__, array( 'OACBase', 'oac_base_activate' ) );
 register_deactivation_hook( __FILE__, array( 'OACBase', 'oac_base_deactivate' ) );
 if( is_admin() ) require_once( 'scoper/wp-scoper-admin.php' );
+add_action( 'admin_menu', array( 'OACBase', 'oac_base_admin_menu' ) );
 add_action( 'admin_menu', 'wp_scoper_admin_menu' );
 add_action( 'admin_init', 'wp_scoper_admin_init' );
 ?>
