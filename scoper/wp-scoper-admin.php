@@ -1,6 +1,5 @@
 <?php
 
-//require_once( 'csv-scope-loader.php' );
 function wp_scoper_admin_init() {
 	$plugin_dir = basename( dirname( __FILE__ ) );
 	load_plugin_textdomain( 'wp_scoper', null, $plugin_dir . '/languages' );
@@ -64,10 +63,10 @@ function wp_scoper_admin_page() {
 					if( ! array_key_exists( $_REQUEST['id'], $available_scopes ) ) {
 						wp_die( __( 'The requested scope does not exist.' ) );
 					}
-					$current_scope = get_option( 'oac_scope_'.$_REQUEST['id'], array() );
-					if( count( $current_scope ) != 0 ) {
-						// Ugly display right now
-						print_r( $current_scope->data );
+					$current_scope = new WPScoper( 'oac_scope_'.$_REQUEST['id'], true );
+					if ( count( $current_scope->scope->data ) != 0 ) {
+						// Ugly representation
+						echo nl2br( print_r( $current_scope, true ) );
 					}
 				// Load the form for this id	
 				?>
@@ -142,55 +141,28 @@ function wp_scoper_admin_page() {
 <?php
 }
 
-function wp_scoper_admin_compare_meta( $a, $b ) {
-	// Quick check first, they should have the same amount of meta data
-	if( ($metasize = count( $a ) ) != count( $b ) ) return false;
-	// Now check the values of the meta data
-	for( $i = 0; $i < $metasize; $i++ ) {
-		foreach( $a[$i] as $mvalue => $mdata ) {
-			if( $mvalue != 'next_index' ) {
-				if( $a[$i][$mvalue] != $b[$i][$mvalue] ) return false;
-			}
-		}
+function wp_scoper_admin_display_errors( $errors ) {
+	$first_error = array_shift( $errors );
+	echo '<div class="error" id="message"><p><strong>'.$first_error.'</strong></p>';
+	if( count( $errors ) == 0 ) {
+		echo '</div>';
+	} else {
+		echo '<p>'.implode( '<br />', $errors ).'</p></div>';
 	}
-	return true;
 }
 
 function wp_scoper_admin_csv_update_scope( $scope_id, $file, $append ) {
-	$builder = null;
-	$current_scope = get_option( 'oac_scope_'.$scope_id, array() );
-	if( count( $current_scope ) == 0 ) $append = false;
-	$builder = new CSVScopeLoader( $file );
-	if( count( $builder->error ) != 0 ) {
-			// The file isn't there
-		echo '<div id="message" class="error"><p><strong>' . __( 'The CSV file could not be found. Please contact the system administrator.' ) . '</strong></p></div>';
-	} else {
-		if( $append == false ) {
-			if( $builder->parse() === false ) {
-				echo '<div id="message" class="error"><p><strong>'.__( 'The following error(s) have occurred while processing the file:' ) . '</strong><br />'.implode( '<br />', $builder->error ).'</p></div>';
-			} else {
-				update_option( 'oac_scope_' . $scope_id, $builder->scope );
-				echo '<div id="message" class="updated"><p>' . __( 'Scope updated successfully' ) . '</p></div>';
-			}
-		} else {	
-			if( $builder->parse( true ) === false )  {
-				echo '<div id="message" class="error"><p><strong>'.__( 'The following error(s) have occurred while processing the file:' ) . '</strong><br />'.implode( '<br />', $builder->error ).'</p></div>';
-			} else {
-				// Validate new meta with old meta (should be the same)
-				if( wp_scoper_admin_compare_meta( $current_scope->get_meta(), $builder->scope->get_meta() ) ) {
-					// Merge the two arrays (recursively)
-					if( $builder->import_scope( $current_scope ) ) {
-						$builder->parse();
-						echo '<div id="message" class="updated"><p>' . __( 'Scope updated successfully' ). '</p></div>';
-					} else {
-						echo '<div id="message" class="error"><p><strong>' . __( 'There was a problem updating the scope. Please try overwriting the scope by unchecking Append' ). '</strong></p></div>';
-					}
-				} else {
-					echo '<div id="message" class="error"><p><strong>'.__( 'The new scope is incompatable with the old scope. Please verify the columns match' ).'</strong></p></div>';
-				}
-			}
-		}
+	$current_scope = new WPScoper( 'oac_scope_'.$scope_id );
+	if( count( $current_scope->scope->data ) == 0 ) {
+	       	$append = false;
 	}
+	if( $current_scope->buildFromCSV( $file, $append ) ) {
+		echo '<div class="updated" id="message"><p><strong>Scope updated successfully</strong></p></div>';
+		$current_scope->save();
+	} else {
+		$current_scope->scope->flush_errors( 'wp_scoper_admin_display_errors' ); 
+	}
+	
 }
 
 // WordPress Option Descriptions:

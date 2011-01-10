@@ -1,5 +1,5 @@
 <?php
-require_once('array-scoper.php');
+require_once('scope.php');
 
 /**
  * The class responsible for handling CSV files formatted for WPScoper.
@@ -54,7 +54,7 @@ class CSVScopeLoader {
 			$this->error[] = "CSVScopeLoader Error: File ".$csv_file." does not exist.";
 		} else {
 			$this->file = $csv_file;
-			$this->scope = new ArrayScoper();
+			$this->scope = new Scope();
 			$this->headers = array();
 			$this->data = array();
 			$this->order = array(); 
@@ -69,7 +69,7 @@ class CSVScopeLoader {
 	 *
 	 * @since 1.0
 	 */
-	public function parse( $meta_only = false ) {
+	public function parse( $meta_only = false, $data_only = false ) {
 		$retval = true;
 		if( ( $handle = fopen( $this->file, "r" ) ) == false ) {
 			$this->error[] = "CSVScopeLoader Error: Could not open ".$this->file." for reading.";
@@ -77,6 +77,12 @@ class CSVScopeLoader {
 		}
 		if( $meta_only ) {
 			if( ! $this->parse_head( $handle ) ) {
+				$retval = false;
+			}
+		} elseif ( $data_only ) {
+			// Pop off the first line
+			fgetcsv( $handle );
+			if( ! $this->parse_body( $handle ) ) {
 				$retval = false;
 			}
 		} else {
@@ -95,16 +101,40 @@ class CSVScopeLoader {
 	public function import_scope( $scope ) {
 		// First check to make sure it's the right type
 		if( is_object( $scope ) ) {
-			if( get_class( $scope ) != "ArrayScoper" )
+			if( get_class( $scope ) != "Scope" ) {
+				$this->error[] = __METHOD__.': Expected first agrument to be a Scope object.';
 				return false;
+			}
 		} else {
+			$this->error[] = __METHOD__.': Expected first argument to be an object.';
 			return false;
 		}
-
 		$this->scope = $scope;
 		return true;
 	}
 
+	public function merge_scope() {
+		$tmpscope = $this->scope;
+		$this->scope = new Scope();
+		$this->parse( true, false );
+		if( ($metasize = count( $tmpscope->meta ) ) != count( $this->scope->meta ) ) {
+			$this->scope = $tmpscope;
+			$this->error[] = "Could not merge the scopes. Incompatable scopes";
+			return false;
+		}
+		for( $i = 0; $i < $metasize; $i++ ) {
+			foreach( $tmpscope->meta[$i] as $mvalue => $mdata ) {
+				if( $tmpscope->meta[$i][$mvalue] != $this->scope->meta[$i][$mvalue] ) {
+					$this->error[] = "Could not merge the scopes. Incompatable scopes";
+					return false;
+				}
+			}
+		}
+
+		$this->scope = $tmpscope;
+		$this->parse( false, true );
+		return true;
+	}
 
 	/**
 	 * Splits the header on the last underscore of the string.
@@ -175,7 +205,7 @@ class CSVScopeLoader {
 				}
 			}
 			foreach( $meta_data as $name => $required_terms )
-				$this->scope->add_depth( $name, $required_terms );
+				$this->scope->add_layer( $name, $required_terms );
 			return true;
 		}
 	}
@@ -199,44 +229,16 @@ class CSVScopeLoader {
 				
 				$line_data[$title][$field] = $value;
 			}
-			
-			foreach( $line_data as $title => $arr_value ) {
-				$depth = array_search( $title, $this->order );
-				if( $depth == 0 ) {
-					$parr = array('parent'=>'');
-				} else {
-					$pbuilder = '';
-					for( $i = $depth; $i > 0; $i-- ) {
-						$parent_title = $this->order[$i-1];
-						$parent_counter = count( $this->data[$parent_title] )-1;
-						if (($pindex = array_search( $this->data[$parent_title], $line_data[$parent_title])) !== false ) {
-							$pbuilder = $pindex.'_'.$pbuilder;
-						} else {
-							$pbuilder = $parent_counter.'_'.$pbuilder;
-						}
-					}
-					$parr = array('parent'=>rtrim( $pbuilder, '_' ) );
-				}
-				$arr_value = array_merge( $parr, $arr_value );
-				if( count( $this->data[$title] ) > 0 ) {
-					if( ! in_array( $arr_value, $this->data[$title] ) ) {
-						$this->data[$title][] = $arr_value;
-					}
-				} else {
-					$this->data[$title][] = $arr_value;
-				}
+			// Due to the logical order of CSV files, the following will always work.
+			$root_entry = array_shift( $line_data );
+
+			if( ( $parent = $this->scope->search_scope( $root_entry ) ) === false ) {
+				$parent = $this->scope->add_node( '', $root_entry, false );
 			}
-		}
-		foreach( $this->order as $title ) {
-			foreach( $this->data[$title] as $_index => $value ) {
-				$parent = $value['parent'];
-				unset( $value['parent'] );
-				if( ($id = $this->scope->add_entry( $parent, $value, true ) ) === false ) { 
-					$this->error = $this->scope->error;
-					return false;
-				}
+			foreach( $line_data as $value ) {
+				$parent = $this->scope->add_node( $parent, $value, false );
 			}
-		}
+		} 
 		return true;
 	} // function parse_body()
 } // class CSVScopeLoader
