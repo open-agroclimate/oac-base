@@ -59,7 +59,7 @@ class Scope {
 		return true;
 	}
 	
-	private function get_depth( $id ) {
+	public function get_depth( $id ) {
 		$id = str_replace( '_', '', $id );
 		return strlen( $id );
 	}
@@ -161,8 +161,12 @@ class Scope {
 		}
 	}
 
+	public function has_children( $parent_id ) {
+		return isset( $this->index[$parent_id] );
+	}
+	
 	public function get_children( $parent_id, $json = false ) {
-		if ( isset( $this->index[$parent_id] ) ) {
+		if ( $this->has_children( $parent_id ) ) {
 			$children = array_intersect_key( $this->data, array_flip( $this->index[$parent_id] ) ); 
 			if ( $json ) {
 				return json_encode( $children );

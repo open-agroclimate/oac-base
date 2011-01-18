@@ -24,6 +24,8 @@
  * @since 1.0
  */
 
+if( is_admin() ) require_once( 'scoper/wp-scoper-admin.php' );
+
 if( !class_exists( 'OACBase' ) ) {
 	class OACBase {
 
@@ -57,6 +59,8 @@ if( !class_exists( 'OACBase' ) ) {
 			wp_register_script( 'raphaeljs', plugins_url( 'js/raphael-min.js', __FILE__ ) );
 			wp_register_script( 'graphael',  plugins_url( 'js/graphael/g.raphael-min.js', __FILE__ ) );
 			wp_register_script( 'grpie',     plugins_url( 'js/graphael/g.pie-min.js', __FILE__ ), array('raphaeljs', 'graphael') );
+			wp_register_script( 'wp-scoper', plugins_url( 'js/wp-scoper-js.php', __FILE__ ), array( 'jquery' ) );
+			wp_register_style ( 'jquery-ui', plugins_url( 'js/jquery-ui/themes/base/jquery-ui.css', __FILE__ ) );
 		}
 
 		/**
@@ -92,12 +96,18 @@ if( !class_exists( 'OACBase' ) ) {
 		 */
 		static public function oac_base_admin_menu()
 		{
-			add_menu_page( 'Open AgroClimate', 'Open AgroClimate', 'manage_options', 'oac_menu', 'OACBase::oac_base_menu_page' );
+			add_menu_page( 'Open AgroClimate', 'Open AgroClimate', 'manage_options', 'oac_menu', array( 'OACBase', 'oac_base_admin_page' ) );
 		}
 
 		static public function oac_base_admin_page()
 		{
-			echo "Under Development";
+		?>
+			<div class="wrap">
+				<?php screen_icon( 'tools' ); ?>
+				<h2>Open AgroClimate: Global Settings</h2>
+				<p>Section Description</p>
+			</div>
+		<?php
 		}
 	}
 }
@@ -106,7 +116,6 @@ if( !class_exists( 'OACBase' ) ) {
 add_action( 'plugins_loaded', array( 'OACBase', 'oac_base_init' ), 9 );
 register_activation_hook( __FILE__, array( 'OACBase', 'oac_base_activate' ) );
 register_deactivation_hook( __FILE__, array( 'OACBase', 'oac_base_deactivate' ) );
-if( is_admin() ) require_once( 'scoper/wp-scoper-admin.php' );
 add_action( 'admin_menu', array( 'OACBase', 'oac_base_admin_menu' ) );
 add_action( 'admin_menu', 'wp_scoper_admin_menu' );
 add_action( 'admin_init', 'wp_scoper_admin_init' );

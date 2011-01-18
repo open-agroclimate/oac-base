@@ -37,13 +37,37 @@ function wp_scoper_admin_action_handler() {
 					wp_die( __( 'You are improperly attempting to edit a scope' ) );
 				}		
 				break;
+			case "wps_remove":
+				if( isset( $_REQUEST['id'] ) ) {
+					check_admin_referer( 'remove-'.$_REQUEST['id'] );
+					if( ! wp_scoper_admin_valid_scope( $_REQUEST['id'] ) ) {
+						wp_die( __( 'The requested scope does not exist.', 'wp_scoper' ) );
+					}
+					$scope_index = get_option( 'oac_scopes', array() );
+					$current_scope = get_option( 'oac_scope_'.$_REQUEST['id'], null );
+					if( in_array( $_REQUEST['id'], $scope_index ) ) {
+						// Verify yet again that it is blank
+						if( count( $scope_index[$_REQUEST['id']] ) != 0 ) {
+							echo '<div id="message" class="error"><p><strong>'.__( 'This scope is still in use.' ).'</strong></p></div>';
+						} else {
+							delete_option( 'oac_scope_'.$_REQUEST['id'] );
+							unset( $scope_index[$_REQUEST['id']] );
+							update_option( 'oac_scopes', $scope_index );
+							echo '<div id="message" class="updated"><p><strong>'.__('Scope has been successfully removed').'</strong></p></div>';
+						}
+					} else {
+						echo '<div id="message" class="error"><p><strong>'.__( 'The requested scope does not exist' ).'</strong></p></div>';
+					}
+				} else {
+					wp_die( __( 'You are improperly attempting to remove a scope' ) );
+				}
+				break;
 		}
 	}
 }
 
 function wp_scoper_admin_menu() {
 	add_submenu_page( 'oac_menu', 'WP Scoper', 'WP Scoper', 'manage_options', 'wp_scoper_listing', 'wp_scoper_admin_page' );
-	//add_management_page( 'WP Scoper', 'WP Scoper', 'manage_options', 'wp_scoper_listing', 'wp_scoper_admin_page' );
 }
 
 function wp_scoper_admin_page() {
@@ -51,7 +75,7 @@ function wp_scoper_admin_page() {
 	$wps_page_uri = "admin.php?page=wp_scoper_listing";
 ?>
 	<div class="wrap">
-		<?php screen_icon(); ?>
+		<?php screen_icon( 'tools' ); ?>
 		<h2><?php _e( 'Scopes', 'wp_scoper' ); ?></h2>
 		<?php 
 			if( ( isset( $_REQUEST['action'] ) ) && ( $_REQUEST['action'] == 'wps_edit' ) ) {
@@ -67,7 +91,8 @@ function wp_scoper_admin_page() {
 					$current_scope = new WPScoper( 'oac_scope_'.$_REQUEST['id'], true );
 					if ( count( $current_scope->scope->data ) != 0 ) {
 						// Ugly representation
-						echo nl2br( print_r( $current_scope, true ) );
+						//echo nl2br( print_r( $current_scope, true ) );
+						echo 'Typically would be displayed here';
 					}
 				// Load the form for this id	
 				?>
@@ -127,7 +152,7 @@ function wp_scoper_admin_page() {
 							<td>
 							<a href="<?php echo wp_nonce_url( $wps_page_uri . '&action=wps_edit&id='. utf8_uri_encode( $scope), 'edit-'.$scope); ?>" title="<?php _e( 'Edit this scope'); ?>"><?php _e( 'Edit' ); ?></a> 
 							<?php if( count( $plugins ) == 0 ) { ?>
-								| <a href="<?php echo wp_nonce_url( $wps_page_uri . '&action=wps_remove&id=' . utf8_uri_encode( $scope ), 'remove-'.$scope ); ?>" title="<?php _e( 'Remove this scope' ); ?>"><?php _e( 'Remove' ); ?></a></td>
+								| <a href="<?php echo wp_nonce_url( $wps_page_uri . '&action=wps_remove&id=' . utf8_uri_encode( $scope ), 'remove-'.$scope ); ?>" title="<?php _e( 'Remove this scope' ); ?>" class="delete"><?php _e( 'Remove' ); ?></a></td>
 							<?php }	?>
 						</tr>
 			<?php

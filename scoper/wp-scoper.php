@@ -8,6 +8,8 @@ class WPScoper {
 	var $scope; // Scope container
 	
 	function __construct( $scope_name, $autoload = true ) {
+		if( substr( $scope_name, 0, 10 ) != 'oac_scope_' )
+			$scope_name = 'oac_scope_'.$scope_name;
 		$this->name  = str_replace('-', '_', sanitize_title_with_dashes( $scope_name ) );
 		$this->scope = new Scope();
 		if ( $autoload ) {
@@ -18,7 +20,8 @@ class WPScoper {
 	function WPScoper( $scope_name, $autoload = true ) {
 		__construct( $scope_name );
 	}
-		
+
+
 	/**
 	 * Loads the named scope into this instance.
 	 */
@@ -79,5 +82,55 @@ class WPScoper {
 		}
 
 	}
+
+	public function populateDDL( $parent_path ='' ) {
+		$options = '';
+		foreach( $this->scope->get_children( $parent_path ) as $child_path => $child_data ) {
+			$options .= '<option value="'.$child_path.'">';
+			if( isset( $child_date['name'] ) ) {
+				$options .= $child_data['name'];
+			} else {
+				$child_data = array_values( $child_data );
+				$options .= $child_data[0];
+			}
+			$options .= "</option>\n";
+		}
+		return $options;
+	}
+
+	public function generateDDL( $path='', $display_label=false, $hook='' ) {
+		// Time constrained - JS only
+		$dropdown = '';
+		if( isset( $this->scope->meta[ $this->scope->get_depth( $path ) ] ) ) {
+			$label     = $this->scope->meta[ $this->scope->get_depth( $path ) ]['name'];
+			if( $display_label )
+				$dropdown  .= '<label for="scope_select_'.$label.'">'.$label."</label>\n";
+
+			// Are there any descendents of a SELECTED item?
+
+			$dropdown .= '<select id="wp-scoper-'.$this->name.'-'.$label.'" class="wp-scoper-select wp-scoper-select-';
+			$dropdown .= ( count( $this->scope->meta ) == $this->scope->get_depth( $path )+1 ) ? 'final' : 'linked'; 
+			$dropdown .= '" name="scope_select_'.$label."\">\n";
+			$dropdown .= $this->populateDDL( $path );
+			$dropdown .= "</select>\n";
+		}
+		return $dropdown;
+	}
+
+	public function generateNestedDDL( $starting_path='', $display_label=false ) {
+		$nested = '';
+		$children = $this->scope->get_children( $starting_path );
+		if( count( $children != 0 ) ) {
+			$nested .= $this->generateDDL( $starting_path, $display_label );
+		}
+		while( count( $children ) != 0 ) {
+			$first_child_path = array_shift( array_keys( $children ) );
+			$nested .= $this->generateDDL( $first_child_path, $display_label );
+			$children = $this->scope->get_children( $first_child_path );
+		}
+		return $nested;
+	}		
+		
 }
+
 ?>
