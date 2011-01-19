@@ -4,8 +4,8 @@ require_once( 'scope.php' );
 require_once( 'csv-scope-loader.php' );
 
 class WPScoper {
-	var $name;  // Scope name. This should be unique within the WP deployment
-	var $scope; // Scope container
+	public $name;  // Scope name. This should be unique within the WP deployment
+	public $scope; // Scope container
 	
 	function __construct( $scope_name, $autoload = true ) {
 		if( substr( $scope_name, 0, 10 ) != 'oac_scope_' )
@@ -17,11 +17,6 @@ class WPScoper {
 		}
 	}
 	
-	function WPScoper( $scope_name, $autoload = true ) {
-		__construct( $scope_name );
-	}
-
-
 	/**
 	 * Loads the named scope into this instance.
 	 */
