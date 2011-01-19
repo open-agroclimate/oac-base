@@ -30,11 +30,18 @@ class Scope {
 		$this->errors = $this->meta = $this->index = $this->data = array();
 	}
 
-	public function is_duplicate( $data ) {
-		if ( ( $dup = array_search( $data, $this->data ) ) !== false )
-			return $dup;
-		else
-			return false;
+	public function is_duplicate( $data, $parent = '', $unique_in_scope = false ) {
+		if( $unique_in_scope ) {
+			if ( ( $dup = array_search( $data, $this->data ) ) !== false )
+				return $dup;
+			else
+				return false;
+		} else {
+			if ( ( $dup = array_search( $data, $this->get_children($parent) ) ) !== false )
+				return $dup;
+			else
+				return false;
+		}
 	}
 
 	public function add_layer( $name='', $fields=array( 'name' ) ) {
@@ -103,7 +110,7 @@ class Scope {
 	public function add_node( $parent='', $data=null, $fail_on_dup = true ) {
 		$parent = trim( $parent );
 		// Check to see if this data is already present
-		if ( ( $dup = $this->is_duplicate( $data ) ) !== false ) {
+		if ( ( $dup = $this->is_duplicate( $data, $parent ) ) !== false ) {
 			if( $fail_on_dup ) {
 				$this->errors[] = __METHOD__.": The following data already exists\n". print_r( $data, true );
 				return false;
@@ -234,7 +241,7 @@ class Scope {
 
 	public function update_node( $node_id, $data ) {
 		$parent_id = $this->get_parent( $node_id );
-		if ( ( $this->is_valid_node( $parent_id, $data ) ) && ( ! $this->is_duplicate( $data ) ) ) {
+		if ( ( $this->is_valid_node( $parent_id, $data ) ) && ( ! $this->is_duplicate( $data, $parent_id ) ) ) {
 			$this->data[$node_id] = $data;
 			return true;
 		}
