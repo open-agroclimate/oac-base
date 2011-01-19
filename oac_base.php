@@ -42,8 +42,7 @@ if( !class_exists( 'OACBase' ) ) {
 		 * 
 		 * @since 1.0
 		 */
-		static public function oac_base_init()
-		{
+		static public function oac_base_init() {
 			// Put the requires inside of the init to make sure it's all or nothing on initialization
 
 			// pChart requires (see LICENSE information)
@@ -60,7 +59,38 @@ if( !class_exists( 'OACBase' ) ) {
 			wp_register_script( 'graphael',  plugins_url( 'js/graphael/g.raphael-min.js', __FILE__ ) );
 			wp_register_script( 'grpie',     plugins_url( 'js/graphael/g.pie-min.js', __FILE__ ), array('raphaeljs', 'graphael') );
 			wp_register_script( 'wp-scoper', plugins_url( 'js/wp-scoper-js.php', __FILE__ ), array( 'jquery' ) );
-			wp_register_style ( 'jquery-ui', plugins_url( 'js/jquery-ui/themes/base/jquery-ui.css', __FILE__ ) );
+			// jqplot script setup.
+			$jqplot_plugins = array( 
+				'BezierCurveRenderer',
+				'barRenderer',
+				'blockRenderer',
+				'bubbleRenderer',
+				'canvasAxisLabelRenderer',
+				'canvasAxisTickRenderer',
+				'canvasAxisTextRenderer',
+				'categoryAxisRenderer',
+				'cursor',
+				'dateAxisRenderer',
+				'donutRenderer',
+				'draggable',
+				'enhancedLegendRenderer',
+				'funnelRenderer',
+				'highlighter',
+				'logAxisRenderer',
+				'mekkoRenderer',
+				'mekkoAxisRenderer',
+				'meterGaugeRenderer',
+				'ohlcRenderer',
+				'pieRenderer',
+				'pointLabels',
+				'trendline' );
+			wp_register_script( 'jqplot-base', plugins_url( 'js/jqplot/jquery.jqplot.min.js', __FILE__ ), array( 'jquery' ) );
+			foreach( $jqplot_plugins as $plugin ) {
+				wp_register_script( 'jqplot-'.strtolower( $plugin ), plugins_url( "js/jqplot/plugins/jqplot.{$plugin}.min.js", __FILE__ ), array( 'jqplot-base' ) );
+			}
+
+			wp_register_style( 'jquery-ui', plugins_url( 'js/jquery-ui/themes/base/jquery-ui.css', __FILE__ ) );
+			wp_register_style( 'jqplot', plugins_url( 'js/jqplot/jquery.jqplot.min.css', __FILE__ ) );
 		}
 
 		/**
@@ -71,8 +101,7 @@ if( !class_exists( 'OACBase' ) ) {
 		 * 
 		 * @since 1.0
 		 */
-		static public function oac_base_activate()
-		{
+		static public function oac_base_activate() {
 			update_option( 'oac_base_info', array('active'=> true, 'base_url'=> plugins_url('', __FILE__), 'base_path' => plugin_dir_path(__FILE__) ) );
 		}
 
@@ -84,8 +113,7 @@ if( !class_exists( 'OACBase' ) ) {
 		 * 
 		 * @since 1.0
 		 */
-		static public function oac_base_deactivate()
-		{
+		static public function oac_base_deactivate() {
 			update_option( 'oac_base_info', false );
 		}
 
@@ -94,13 +122,11 @@ if( !class_exists( 'OACBase' ) ) {
 		 *
 		 * @since 1.0
 		 */
-		static public function oac_base_admin_menu()
-		{
+		static public function oac_base_admin_menu() {
 			add_menu_page( 'Open AgroClimate', 'Open AgroClimate', 'manage_options', 'oac_menu', array( 'OACBase', 'oac_base_admin_page' ) );
 		}
 
-		static public function oac_base_admin_page()
-		{
+		static public function oac_base_admin_page() {
 		?>
 			<div class="wrap">
 				<?php screen_icon( 'tools' ); ?>
@@ -111,102 +137,116 @@ if( !class_exists( 'OACBase' ) ) {
 		}
 
 		static private function lookup_enso() {
-		$enso_array = array();
-		
-		// Retrieve the data from IRI	
-		$enso_uri = 'http://iri.columbia.edu/climate/ENSO/currentinfo/figure3.html';
-		$raw_html = wp_remote_fopen( $enso_uri );
-		
-		// Parse the table with the prediction data
-		$result = preg_match_all("/<tr><td>(?P<prediction_date>[JFMASOND]{3}\ [0-9]{4})<\/td><td>(?P<lanina>[0-9\. ]{1,4})%<\/td><td>(?P<neutral>[0-9\. ]{1,4})%<\/td><td>(?P<elnino>[0-9\. ]{1,4})%<\/td><\/tr>/", $raw_html, $parsed_data);
-		
-		// Return FALSE if any errors, otherwise return the $enso_array
-		if( $result ):
-			$mon_lookup = array();
-			$mon_lookup[] = substr(date( "M", strtotime('now')), 0, 1);
-			$mon_lookup[] = substr(date( "M", strtotime('+1 month')), 0, 1);
-			$mon_lookup[] = substr(date( "M", strtotime('+2 months')), 0, 1).' '.date("Y", strtotime('+2 months'));
-
-			$true_period = implode('', $mon_lookup);
-			$mon_index = array_search($true_period, $parsed_data['prediction_date']);
-			if( $mon_index === false ) return false;
-			// If we get a match back, then store this information in the database as well as update the current timestamp.
-			$enso_array['la_nina_prediction'] = floatval( $parsed_data['lanina'][$mon_index] );
-			$enso_array['neutral_prediction'] = floatval( $parsed_data['neutral'][$mon_index] );
-			$enso_array['el_nino_prediction'] = floatval( $parsed_data['elnino'][$mon_index] );
+			$enso_array = array();
 			
-			// Guess the current phase based on the maximum value of the above
-			$current_phase = array_search( max( $enso_array ), $enso_array );
-			switch( substr( $current_phase, 0, 1 ) ) {
-				case 'l': // La Nina Phase
-					$enso_array['current_phase'] = __( 'La Ni&#241;a' );
-					break;
-				case 'n': // Neutral Phase
-					$enso_array['current_phase'] = __( 'Neutral' );
-					break;
-				case 'e': // El Nino Phase
-					$enso_array['current_phase'] = __( 'El Ni&#241;o' );
-					break;
-				default:
-					$enso_array['current_phase'] = __( 'Unknown' );
-					break;
-			}
-		
-			// Find the current prediciton period ( localized )
-			$month_list    = 'JFMAMJJASONDJF';
-			$pred_month_index  = stripos( $month_list, substr( $parsed_data['prediction_date'], 0, 3 ) ) + 1;
-			$current_period = array();
-			for( $i=0; $i < 3; $i++ ) {
-				$current_period[] = date_i18n( 'M', strtotime( ( ( $pred_month_index + $i ) % 12 ).'/1/'.date( 'Y' ) ) );
-			}
-			$enso_array['current_period'] = implode( '-', $current_period );
+			// Retrieve the data from IRI	
+			$enso_uri = 'http://iri.columbia.edu/climate/ENSO/currentinfo/figure3.html';
+			$raw_html = wp_remote_fopen( $enso_uri );
 			
-			// Set the last_updated to the current time	
-			$enso_array['last_updated'] = strtotime( 'now' );
-			return $enso_array;
-		else:
-			// Email the site administrator(s) to let them know there is a problem
-			return false;
-		endif;
-	}
+			// Parse the table with the prediction data
+			$result = preg_match_all("/<tr><td>(?P<prediction_date>[JFMASOND]{3}\ [0-9]{4})<\/td><td>(?P<lanina>[0-9\. ]{1,4})%<\/td><td>(?P<neutral>[0-9\. ]{1,4})%<\/td><td>(?P<elnino>[0-9\. ]{1,4})%<\/td><\/tr>/", $raw_html, $parsed_data);
+			
+			// Return FALSE if any errors, otherwise return the $enso_array
+			if( $result ):
+				$mon_lookup = array();
+				$mon_lookup[] = substr(date( "M", strtotime('now')), 0, 1);
+				$mon_lookup[] = substr(date( "M", strtotime('+1 month')), 0, 1);
+				$mon_lookup[] = substr(date( "M", strtotime('+2 months')), 0, 1).' '.date("Y", strtotime('+2 months'));
 
-	static public function get_current_enso_data() {
-		$new_data   = false; // Set to true if new data is retrieved
-		
-		// Should I do my checks here or not?
-		if( $enso_array = get_option( 'oac_current_enso_data', false ) ) {
-			// Check the timestamp (if there is one) for freshness (2 weeks)
-			if( strtotime( '+1 day', $enso_array['last_updated'] ) < strtotime( 'now' ) ) {
-				// If there isn't an error getting the ENSO data, save it otherwise, keep our old data (the administrator got an email anyways)
-				$new_enso_array = self::lookup_enso();
-				if( $new_enso_array != false ) {
-					$enso_array = $new_enso_array;
-					$new_data = true;
+				$true_period = implode('', $mon_lookup);
+				$mon_index = array_search($true_period, $parsed_data['prediction_date']);
+				if( $mon_index === false ) return false;
+				// If we get a match back, then store this information in the database as well as update the current timestamp.
+				$enso_array['la_nina_prediction'] = floatval( $parsed_data['lanina'][$mon_index] );
+				$enso_array['neutral_prediction'] = floatval( $parsed_data['neutral'][$mon_index] );
+				$enso_array['el_nino_prediction'] = floatval( $parsed_data['elnino'][$mon_index] );
+				
+				// Guess the current phase based on the maximum value of the above
+				$current_phase = array_search( max( $enso_array ), $enso_array );
+				switch( substr( $current_phase, 0, 1 ) ) {
+					case 'l': // La Nina Phase
+						$enso_array['current_phase'] = __( 'La Ni&#241;a' );
+						break;
+					case 'n': // Neutral Phase
+						$enso_array['current_phase'] = __( 'Neutral' );
+						break;
+					case 'e': // El Nino Phase
+						$enso_array['current_phase'] = __( 'El Ni&#241;o' );
+						break;
+					default:
+						$enso_array['current_phase'] = __( 'Unknown' );
+						break;
 				}
-			}
-		} else {
-			// Lookup the data, save it and move on
-			$enso_array = self::lookup_enso();
-			if( $enso_array != false ) {
-				$new_data = true;
+			
+				// Find the current prediciton period ( localized )
+				$month_list    = 'JFMAMJJASONDJF';
+				$pred_month_index  = stripos( $month_list, substr( $parsed_data['prediction_date'], 0, 3 ) ) + 1;
+				$current_period = array();
+				for( $i=0; $i < 3; $i++ ) {
+					$current_period[] = date_i18n( 'M', strtotime( ( ( $pred_month_index + $i ) % 12 ).'/1/'.date( 'Y' ) ) );
+				}
+				$enso_array['current_period'] = implode( '-', $current_period );
+				
+				// Set the last_updated to the current time	
+				$enso_array['last_updated'] = strtotime( 'now' );
+				return $enso_array;
+			else:
+				// Email the site administrator(s) to let them know there is a problem
+				return false;
+			endif;
+		}
+
+		static public function get_current_enso_data() {
+			$new_data   = false; // Set to true if new data is retrieved
+			
+			// Should I do my checks here or not?
+			if( $enso_array = get_option( 'oac_current_enso_data', false ) ) {
+				// Check the timestamp (if there is one) for freshness (2 weeks)
+				if( strtotime( '+1 day', $enso_array['last_updated'] ) < strtotime( 'now' ) ) {
+					// If there isn't an error getting the ENSO data, save it otherwise, keep our old data (the administrator got an email anyways)
+					$new_enso_array = self::lookup_enso();
+					if( $new_enso_array != false ) {
+						$enso_array = $new_enso_array;
+						$new_data = true;
+					}
+				}
 			} else {
-				$enso_array = array();
-			}
-		} //if ( get_option ... )
-		if( $new_data )
-			update_option( 'oac_current_enso_data', $enso_array );
-		
-		return $enso_array;
+				// Lookup the data, save it and move on
+				$enso_array = self::lookup_enso();
+				if( $enso_array != false ) {
+					$new_data = true;
+				} else {
+					$enso_array = array();
+				}
+			} //if ( get_option ... )
+			if( $new_data )
+				update_option( 'oac_current_enso_data', $enso_array );
+			
+			return $enso_array;
 
+		}
+
+		static public function get_current_enso_phase() {
+			$enso_array = self::get_current_enso_data();
+			return $enso_array['current_phase'];
+		}
+
+		static public function display_enso_selector( $phases_only = false ) {
+			$current_phase_id = substr( self::get_current_enso_phase(), 0, 1 );
+			$output = '<ul id="enso_select">';
+			$output .= '<li class="neutral"><input type="radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral' ).'</li>';
+			$output .= '<li class="elnino"> <input type="radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o' ).'</li>';
+			$output .= '<li class="lanina"> <input type="radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a' ).'</li>';
+			if ( ! $phases_only )
+				$output .= '<li class="allYears"><input type="radio" name="ensophase" value="4">'.__( 'All Years' ).'</li>';
+			$output .= '</ul>';
+			return $output;
+		}
+
+		static public function ie_conditionals() {
+			echo '<!--[if IE]><script language="javascript" type="text/javascript" src="'.plugins_url( 'js/jqplot/excanvas.js', __FILE__ ).'"></script><![endif]-->';
+		}
 	}
-
-	static public function get_current_enso_phase() {
-		$enso_array = self::get_current_enso_data();
-		return $enso_array['current_period'];
-	}
-
-	
-
 }
 
 // WordPress Hooks
