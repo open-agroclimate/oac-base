@@ -103,7 +103,7 @@ class WPScoper {
 
 			// Are there any descendents of a SELECTED item?
 
-			$dropdown .= '<select id="wp-scoper-'.$this->name.'-'.$label.'" class="wp-scoper-select wp-scoper-select-';
+			$dropdown .= '<select id="wp-scoper-'.$this->name.'-'.$label.'" class="oac-input oac-select wp-scoper-select wp-scoper-select-';
 			$dropdown .= ( count( $this->scope->meta ) == $this->scope->get_depth( $path )+1 ) ? 'final' : 'linked'; 
 			$dropdown .= '" name="scope_select_'.$label."\">\n";
 			$dropdown .= $this->populateDDL( $path );

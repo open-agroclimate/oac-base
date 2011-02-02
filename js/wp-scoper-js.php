@@ -4,24 +4,46 @@ $handlerurl = substr( $_SERVER['PHP_SELF'], 0, strrpos( $_SERVER['PHP_SELF'], '/
 
 $js = '';
 $js .= "jQuery(document).ready( function($) {\n\t";
-$js .= 'handlerurl = "'.$handlerurl."/wp-scoper-js-handler.php\";\n";
+$js .= 'scoperhandlerurl = "'.$handlerurl."/wp-scoper-js-handler.php\";\n";
 $js .= <<< EOJS
-	$(".wp-scoper-select-linked").live('change', function() {
+	$(".wp-scoper-select-linked").queue( "cb-stack", function( next ) {
 		scope = getCurrentScope( $(this) );
-		$.get( handlerurl+'?action=get_ddl_children&scope='+scope+'&pp='+$(this).val(), function( data ) {
+		$.get( scoperhandlerurl+'?action=get_ddl_children&scope='+scope+'&pp='+$(this).val(), function( data ) {
 			var d = $.parseJSON( data );
 			for( var i = 0; i < d.length; i++ ) {
 				var replace = $("#wp-scoper-"+scope+"-"+d[i]['replace']);
 				replace.empty();
 				replace.html( d[i]['ddl'] );
 			}
-			alert( wpScoperGetFinal( scope ) );
 		});
+		next();
 	});
 
-	$(".wp-scoper-select-final").live('change', function() {
+	// Always want to try and run the above before anything else, so let's do that.
+	if( $.isArray( $(".wp-scoper-select-linked").queue() ) ) {
+		var lastFun = $(".wp-scoper-select-linked").queue( "cb-stack" ).pop();
+		$(".wp-scoper-select-linked").queue( "cb-stack").unshift( lastFun );
+	}
+	
+	$(".wp-scoper-select-linked").bind('change', function() {
+		if ( $(this).data('hasRun') == undefined ) {
+			$(this).data('hasRun', false);
+			$(this).data('wp-scoper', false );
+		}
+
+		if( ( $(this).data('hasRun') == false ) || ( ( $(this).data('wp-scoper') == true ) && ( $(this).data('hasRun') == true ) )) {
+			var tmpQueue = $.extend( true, [], $(this).queue( "cb-stack" ) );
+			$(this).dequeue( "cb-stack" );
+			$(this).queue( "cb-stack", tmpQueue );
+			$(this).data('hasRun', true);
+			$(this).data('wp-scoper', true );
+		} else {
+			$(this).data('hasRun', false );
+		}
+	});
+
+	$(".wp-scoper-select-final").bind('change', function() {
 		var scope = getCurrentScope( $(this) );
-		alert( wpScoperGetFinal( scope ) );
 	});
 });
 

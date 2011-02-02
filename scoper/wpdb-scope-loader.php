@@ -105,7 +105,7 @@ class WPDBScopeLoader {
 			$this->scope->add_layer( $title, $field );
 		}
 
-		$finder = 'SELECT DISTINCT';
+		$finder = 'SELECT DISTINCT ';
 		foreach( $this->mapped_fields as $column ) {
 			$finder .= $column.', ';
 		}
@@ -131,9 +131,8 @@ class WPDBScopeLoader {
 }
 
 
-$test = new WPDBScopeLoader('location');
-$test->addField( 'State_short', 'state' );
-$test->addField( 'County_name', 'county' );
+$test = new WPDBScopeLoader('location_py');
+$test->addField( 'Departamento_name', 'county' );
 $test->generateScope( 'location' );
 
 $wpscope = new WPScoper( 'location' );
