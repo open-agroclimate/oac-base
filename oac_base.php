@@ -58,6 +58,7 @@ if( !class_exists( 'OACBase' ) ) {
 			wp_register_script( 'raphaeljs', plugins_url( 'js/raphael-min.js', __FILE__ ) );
 			wp_register_script( 'graphael',  plugins_url( 'js/graphael/g.raphael-min.js', __FILE__ ) );
 			wp_register_script( 'grpie',     plugins_url( 'js/graphael/g.pie-min.js', __FILE__ ), array('raphaeljs', 'graphael') );
+			wp_register_script( 'oac-base',  plugins_url( 'js/oac-base.js', __FILE__ ), array( 'jquery' ) );
 			wp_register_script( 'wp-scoper', plugins_url( 'js/wp-scoper-js.php', __FILE__ ), array( 'jquery' ) );
 			// jqplot script setup.
 			$jqplot_plugins = array( 
@@ -68,6 +69,7 @@ if( !class_exists( 'OACBase' ) ) {
 				'canvasAxisLabelRenderer',
 				'canvasAxisTickRenderer',
 				'canvasAxisTextRenderer',
+				'canvasTextRenderer',
 				'categoryAxisRenderer',
 				'cursor',
 				'dateAxisRenderer',
@@ -84,11 +86,13 @@ if( !class_exists( 'OACBase' ) ) {
 				'pieRenderer',
 				'pointLabels',
 				'trendline' );
-			wp_register_script( 'jqplot-base', plugins_url( 'js/jqplot/jquery.jqplot.min.js', __FILE__ ), array( 'jquery' ) );
+			wp_register_script( 'jqplot-base', plugins_url( 'js/jqplot/jquery.jqplot'.((WP_DEBUG === true) ? '' : '.min').'.js', __FILE__ ), array( 'jquery' ) );
 			foreach( $jqplot_plugins as $plugin ) {
-				wp_register_script( 'jqplot-'.strtolower( $plugin ), plugins_url( "js/jqplot/plugins/jqplot.{$plugin}.min.js", __FILE__ ), array( 'jqplot-base' ) );
+				wp_register_script( 'jqplot-'.strtolower( $plugin ), plugins_url( "js/jqplot/plugins/jqplot.{$plugin}".((WP_DEBUG === true) ? '' : '.min').'.js', __FILE__ ), array( 'jqplot-base' ) );
 			}
-
+			// datatables script setup
+			wp_register_script( 'datatables', plugins_url( 'js/datatables/jquery.datatables.min.js', __FILE__ ), array( 'jquery' ) );
+			wp_register_script( 'datatables-plugins', plugins_url( 'js/datatables/jquery.datatables.plugins.js', __FILE__ ), array( 'datatables' ) );
 			wp_register_style( 'jquery-ui', plugins_url( 'js/jquery-ui/themes/base/jquery-ui.css', __FILE__ ) );
 			wp_register_style( 'jqplot', plugins_url( 'js/jqplot/jquery.jqplot.min.css', __FILE__ ) );
 		}
@@ -180,7 +184,7 @@ if( !class_exists( 'OACBase' ) ) {
 			
 				// Find the current prediciton period ( localized )
 				$month_list    = 'JFMAMJJASONDJF';
-				$pred_month_index  = stripos( $month_list, substr( $parsed_data['prediction_date'], 0, 3 ) ) + 1;
+				$pred_month_index  = stripos( $month_list, substr( $parsed_data['prediction_date'][$mon_index], 0, 3 ) ) + 1;
 				$current_period = array();
 				for( $i=0; $i < 3; $i++ ) {
 					$current_period[] = date_i18n( 'M', strtotime( ( ( $pred_month_index + $i ) % 12 ).'/1/'.date( 'Y' ) ) );
@@ -233,18 +237,36 @@ if( !class_exists( 'OACBase' ) ) {
 
 		static public function display_enso_selector( $phases_only = false ) {
 			$current_phase_id = substr( self::get_current_enso_phase(), 0, 1 );
-			$output = '<ul id="enso_select">';
-			$output .= '<li class="neutral"><input type="radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral' ).'</li>';
-			$output .= '<li class="elnino"> <input type="radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o' ).'</li>';
-			$output .= '<li class="lanina"> <input type="radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a' ).'</li>';
+			$output = '<ul id="enso-select">';
+			$output .= '<li class="neutral" style="background-color: #00ff66;"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral' ).'</li>';
+			$output .= '<li class="elnino" style="background-color: #ff6666;"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o' ).'</li>';
+			$output .= '<li class="lanina" style="background-color: #00ccff;"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a' ).'</li>';
 			if ( ! $phases_only )
-				$output .= '<li class="allYears"><input type="radio" name="ensophase" value="4">'.__( 'All Years' ).'</li>';
+				$output .= '<li class="allYears" style="background-color: #808080;"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4">'.__( 'All Years' ).'</li>';
 			$output .= '</ul>';
 			return $output;
 		}
 
 		static public function ie_conditionals() {
 			echo '<!--[if IE]><script language="javascript" type="text/javascript" src="'.plugins_url( 'js/jqplot/excanvas.js', __FILE__ ).'"></script><![endif]-->';
+		}
+		
+		static public function knsort( $array ) {
+			$keys = array_keys($array);
+		    natsort($keys);
+			
+			$new_array = array();
+		    foreach ($keys as $k)
+		    {
+		        $new_array[$k] = $array[$k];
+		    }
+		
+			return $new_array;
+		}
+		
+		static public function knrsort($array) 
+		{
+		    return array_reverse( self::knsort($array), true );
 		}
 	}
 }
