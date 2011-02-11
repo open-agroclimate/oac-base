@@ -33,7 +33,7 @@ if( !class_exists( 'OACBase' ) ) {
 	 	/**
 		 * Initializes pChart and (g)RaphaelJs libraries
 		 * 
-		 * oac_base_init() Sets up the registration of the raphaelJS / gRaphael
+		 * init() Sets up the registration of the raphaelJS / gRaphael
 		 * vector library. To use, choose the TYPE of chart you desire:
 		 * <code> 
 		 * wp_enqueue_script('grpie'); // Includes raphael-min.js, g.raphael-min.js and g.pie-min.hs files
@@ -41,7 +41,7 @@ if( !class_exists( 'OACBase' ) ) {
 		 * 
 		 * @since 1.0
 		 */
-		static public function oac_base_init() {
+		static public function init() {
 			// Put the requires inside of the init to make sure it's all or nothing on initialization
 			
 			// WP_Scoper
@@ -101,53 +101,10 @@ if( !class_exists( 'OACBase' ) ) {
 				)
 			);
 		}
-		/**
-		 * Sets the oac_base_info option in WordPress to true.
-		 *
-		 * The oac_base_info option is used internally by other OAC tools. This
-		 * method is fired on plugin activation.
-		 * 
-		 * @since 1.0
-		 */
-		static public function oac_base_activate() {
-			update_option( 'oac_base_info', array('active'=> true, 'base_url'=> plugins_url('', __FILE__), 'base_path' => plugin_dir_path(__FILE__) ) );
-		}
-
-		/**
-		 * Sets the oac_base_info option in WordPress to false.
-		 *
-		 * The oac_base_info option is used interally by other OAC tools. This
-		 * method is fired on plugin deactivation.
-		 * 
-		 * @since 1.0
-		 */
-		static public function oac_base_deactivate() {
-			update_option( 'oac_base_info', false );
-		}
-
-		/***
-		 * Sets up the Open AgroClimate menu in WordPress
-		 *
-		 * @since 1.0
-		 */
-		static public function oac_base_admin_menu() {
-			add_menu_page( 'Open AgroClimate', 'Open AgroClimate', 'manage_options', 'oac_menu', array( 'OACBase', 'oac_base_admin_page' ) );
-		}
-
-		static public function oac_base_admin_page() {
-		?>
-			<div class="wrap">
-				<?php screen_icon( 'tools' ); ?>
-				<h2>Open AgroClimate: Global Settings</h2>
-				<h3>Units</h3>
-				<p>Please choose the standard unit of measurement used by your data. <strong>NOTE:</strong><em>This can be overridden per plugin as well</em></p>
-				
-			</div>
-		<?php
-		}
-
-		static public function get_unit( $var ) {
-			
+		
+		static public function get_unit( $callee, $var ) {
+			$type = get_option( $callee.'_units', get_option( 'oac_base_units', 'Metric' ) );
+			return ( isset( self::$units[$type][$var] ) ) ? self::$units[$type][$var] : '';
 		}
 		
 		static private function lookup_enso() {
@@ -279,12 +236,100 @@ if( !class_exists( 'OACBase' ) ) {
 		}
 	}
 }
+// For once, we are putting the handling code for the admin at the bottom. This is a special
+// exception to the norm.
+
+class OACBaseAdmin {
+	static public function init() {
+		OACBase::init();
+		self::admin_handler();
+	}
+	/**
+	 * Sets the oac_base_info option in WordPress to true.
+	 *
+	 * The oac_base_info option is used internally by other OAC tools. This
+	 * method is fired on plugin activation.
+	 * 
+	 * @since 1.0
+	 */
+	static public function activate() {
+		update_option( 'oac_base_info', array('active'=> true, 'base_url'=> plugins_url('', __FILE__), 'base_path' => plugin_dir_path(__FILE__) ) );
+	}
+
+	/**
+	 * Sets the oac_base_info option in WordPress to false.
+	 *
+	 * The oac_base_info option is used interally by other OAC tools. This
+	 * method is fired on plugin deactivation.
+	 * 
+	 * @since 1.0
+	 */
+	static public function deactivate() {
+		update_option( 'oac_base_info', false );
+	}
+
+	/***
+	 * Sets up the Open AgroClimate menu in WordPress
+	 *
+	 * @since 1.0
+	 */
+	static public function admin_menu() {
+		add_menu_page( 'Open AgroClimate', 'Open AgroClimate', 'manage_options', 'oac_menu', array( 'OACBaseAdmin', 'admin_page' ) );
+	}
+
+	static public function admin_handler() {
+		// First we need to check the user permissions
+		//if( !current_user_can( 'manage_options' ) ) {
+		//	wp_die( __( 'You do not have sufficient permission to access this page.' ) );
+		//}
+		if( isset( $_REQUEST['action'] ) ) {
+			switch( $_REQUEST['action'] ) {
+				case 'oacb_update_options':
+					check_admin_referer( 'update-base-options' );
+					update_option( 'oac_base_units', $_REQUEST['base_units'] );
+					echo '<div id="message" class="updated"><p><strong>'.__('Global Settings updated').'</strong></p></div>';
+					break;
+			}
+		}
+	}
+
+	static public function admin_page() {
+		$base_units = get_option('oac_base_units', 'Metric' );
+	?>
+		<div class="wrap">
+			<?php screen_icon( 'tools' ); ?>
+			<h2>Open AgroClimate: Global Settings</h2>
+			<h3>Units</h3>
+			<p>Please choose the standard unit of measurement used by your data.<br>
+			<form action="<?php echo esc_attr( $_SERVER['REQUEST_URI'] ); ?>" method="POST">
+				<?php wp_nonce_field( 'update-base-options' ); ?>
+				<input type="hidden" name="action" value="oacb_update_options">
+				<label for="base_units">Units in: </label>
+				<select id="base_units" name="base_units">
+				<?php 
+					foreach( array_keys( OACBase::$units ) as $key ) {
+						echo "<option value=\"{$key}\"".($base_units == $key ? " selected" : "").">{$key}</option>";
+					}
+				?>
+				</select>
+				<p><input type="submit" class="button" value="Update Settings" /></p>
+			</form>
+			
+		</div>
+	<?php
+	}
+
+	
+}
 
 // WordPress Hooks
-add_action( 'plugins_loaded', array( 'OACBase', 'oac_base_init' ), 9 );
-register_activation_hook( __FILE__, array( 'OACBase', 'oac_base_activate' ) );
-register_deactivation_hook( __FILE__, array( 'OACBase', 'oac_base_deactivate' ) );
-add_action( 'admin_menu', array( 'OACBase', 'oac_base_admin_menu' ) );
-add_action( 'admin_menu', 'wp_scoper_admin_menu' );
-add_action( 'admin_init', 'wp_scoper_admin_init' );
+add_action( 'plugins_loaded', array( 'OACBase', 'init' ), 9 );
+register_activation_hook( __FILE__, array( 'OACBaseAdmin', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'OACBaseAdmin', 'deactivate' ) );
+if( is_admin() ) {
+	add_action( 'admin_init', array('OACBaseAdmin', 'init' ) );
+	add_action( 'admin_menu', array( 'OACBaseAdmin', 'admin_menu' ) );
+	add_action( 'admin_menu', 'wp_scoper_admin_menu' );
+	add_action( 'admin_init', 'wp_scoper_admin_init' );
+}
 ?>
