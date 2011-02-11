@@ -48,7 +48,7 @@ if( !class_exists( 'OACBase' ) ) {
 			require_once( 'scoper/wp-scoper.php' );
 			
 			// raphaeljs/gRapahel script setup.
-			wp_register_script( 'raphaeljs', plugins_url( 'js/raphael-min.js', __FILE__ ) );
+			wp_register_script( 'raphaeljs', plugins_url( 'js/raphael.js', __FILE__ ) );
 			wp_register_script( 'graphael',  plugins_url( 'js/graphael/g.raphael.js', __FILE__ ) );
 			wp_register_script( 'grpie',     plugins_url( 'js/graphael/g.pie.js', __FILE__ ), array('raphaeljs', 'graphael') );
 			wp_register_script( 'grbar',     plugins_url( 'js/graphael/g.bar.js', __FILE__), array('raphaeljs', 'graphael' ) );
@@ -215,7 +215,6 @@ if( !class_exists( 'OACBase' ) ) {
 		}
 
 		static public function ie_conditionals() {
-			echo '<!--[if IE]><script language="javascript" type="text/javascript" src="'.plugins_url( 'js/jqplot/excanvas.js', __FILE__ ).'"></script><![endif]-->';
 		}
 		
 		static public function knsort( $array ) {

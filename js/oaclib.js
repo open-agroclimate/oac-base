@@ -8,20 +8,20 @@
 		init: function() {
 			return this;
 		},
-		cleanData: function( data, labels ) {
+		cleanData: function( data ) {
 			var modData = [],
-				modLabels = [];
+				modInvalid = []
 				
 			for( var index = 0; index < data.length; index++ ) {
 				if( !isNaN(data[index]) ) {
 					modData.push( data[index]);
-					if( labels !== undefined ) {
-						modLabels.push( labels[index] );
-					}
+				} else {
+					modData.push( "0" );
+					modInvalid.push( index+1 );
 				}
 			}
 						
-			return (labels === undefined) ? { data: modData, labels: undefined} : { data: modData, labels: modLabels };
+			return { data: modData, invalid: modInvalid };
 		},
 		drawTable: function( tableBody, html ) {
 			jQuery(tableBody).empty();
@@ -69,72 +69,6 @@
 		// graphOptions = { title: "Title of the graph", xlabel: "The label on the x-axis", ylabel: "The label of the bars", yunits: "Unit of measure (eg. mm, F, C, inches)"}
 		// barOptions = { typical bargraph.opts}
 		// axisOptions = { from: starting value (default 0), to: ending value (default the max value of data), steps: how many hashes (default 10) }
-		graphBarWithAxis: function(paper, x, y, width, height, data, labels, graphOptions, barOptions, axisOptions) {
-			graphOptions = graphOptions || {};
-			barOptions   = barOptions ||{};
-			axisOptions  = axisOptions || {};
-			var	vgutter     = barOptions.vgutter || 20,
-				gutter      = parseFloat(barOptions.gutter || "20%"),
-				from        = axisOptions.from || 0,
-				to          = axisOptions.to   || Math.max.apply(null, data),
-				steps       = axisOptions.step || 10,
-				startx      = 0,
-				starty      = 0,
-				gwidth      = width,
-				gheight     = height,
-				graphtitle, xlabel, ylabel;
-			
-			// Add the title, shifting everything down
-			if (graphOptions.title !== undefined ) {
-				graphtitle = paper.text( width/2, y, graphOptions.title );
-				graphtitle.attr({'font-size': 19 });
-				gtbb = graphtitle.getBBox();
-				graphtitle.attr({y: y+gtbb.height/1.75 });
-				starty = gtbb.height/1.75;
-				gheight -= starty;
-			}
-		
-			// Add an xlabel, squishing everything up
-			if( graphOptions.xlabel !== undefined ) {
-				xlabel = paper.text( width/2, height, graphOptions.xlabel );
-				xlabel.attr({'font-size': 14 });
-				xlbb = xlabel.getBBox();
-				xlabel.attr({y: height-(xlbb.height/1.5)-vgutter/2 });
-				gheight -= xlbb.height/1.25+vgutter;
-			}
-		
-			// Add a ylabel, shifting everything to the right (RTL must be made later)
-			if( graphOptions.ylabel !== undefined ) {
-				ylabel = paper.text( x, gheight/2, graphOptions.ylabel+(graphOptions.yunit ? " ("+graphOptions.yunit+")" : "") );
-				ylabel.attr({'font-size': 14 });
-				ylbb = ylabel.getBBox();
-				ylabel.attr({rotation: -90, x: x+ylbb.height/1.5+gutter/2});
-				startx = startx + ylbb.height+gutter;
-			}
-			
-			// Draw the axis and shift everything again to the right
-			var	axis   = paper.g.axis(startx+gutter, gheight-starty, gheight-2*vgutter, from, to, steps, 1 ),
-				axisbb = axis.all.getBBox();
-				axis.all.translate(axisbb.width/2);
-				startx += axisbb.width/2+gutter*2;
-			
-			gwidth -= startx;
-			// for some reason I cannot get the [[]] color to work, so I hacked it out
-			if( !jQuery.isArray( barOptions.colors ) && barOptions.colors !== undefined ) {
-				var _color = barOptions.colors;
-				barOptions.colors = [];
-				jQuery.each(data, function() {
-					barOptions.colors.push(_color);
-				});
-				
-			}
-			
-			var bargraph = paper.g.barchart(startx, starty, gwidth, gheight, data, barOptions);
-			if( labels !== undefined ) {
-				bargraph.label(labels, true);
-			}
-			return bargraph;
-		},
 		chartWithAxis: function(chartFun, paper, x, y, width, height, data, labels, graphOptions, chartOptions, axisOptions) {
 			graphOptions = graphOptions || {};
 			chartOptions = chartOptions ||{};
@@ -191,10 +125,10 @@
 				
 			}
 			
-			// Draw the axis and shift everything again to the up and to the right (respoctivley)
+			// Draw the axis and shift everything  up 
 			var	yaxis   = paper.g.axis(startx+gutter, gheight+vgutter+1, gheight-vgutter, yfrom, yto, ysteps, 1 ),
 				yaxisbb = yaxis.all.getBBox();
-				yaxis.all.translate(yaxisbb.width/2);
+				yaxis.all.translate(yaxisbb.width/2, 0);
 				startx += yaxisbb.width;
 				
 			
@@ -207,6 +141,7 @@
 			opts = opts || {};
 			labelopts = labelopts || {};
 			opts.vgutter = opts.vgutter || 20;
+			opts.gutter = opts.gutter || 20;
 			y = y - opts.vgutter;
 			if( !jQuery.isArray( opts.colors ) && opts.colors !== undefined ) {
 				var _color = opts.colors;
@@ -220,7 +155,7 @@
 				bargraph.label(labels, true, true );
 				bargraph.labels.attr(labelopts);
 			}
-			return {graph: bargraph, labels: bargraph.labels, x: x, y: y, height: height, width: width};
+			return {graph: bargraph, labels: bargraph.labels, x: x, y: y, height: height, width: width, overlayxoffset: bargraph.bars[0].w/2};
 		},
 		deviationbarchart: function(paper, x, y, width, height, data, labels, opts, labelopts ) {
 			return oac().barchart(paper, x, y, width, height, data, labels, opts, labelopts);
@@ -263,7 +198,7 @@
 				xaxis = paper.g.axis(x+gutter, height+1, width-(gutter*2), xfrom, xto, xsteps, undefined, labels);
 				xaxis.text.attr(axisopts);
 			}
-			return { graph: linegraph, labels: (axisopts.noaxis ? [] : xaxis.text), x: x, y: y, height: height, width: width };
+			return { graph: linegraph, labels: (axisopts.noaxis ? [] : xaxis.text), x: x, y: y, height: height, width: width, overlayxoffset: 0 };
 			
 		},
 		version: 0.1,
