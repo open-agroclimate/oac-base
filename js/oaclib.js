@@ -220,24 +220,26 @@
 				bargraph.label(labels, true, true );
 				bargraph.labels.attr(labelopts);
 			}
-			return {graph: bargraph, labels: bargraph.labels};
+			return {graph: bargraph, labels: bargraph.labels, x: x, y: y, height: height, width: width};
 		},
 		deviationbarchart: function(paper, x, y, width, height, data, labels, opts, labelopts ) {
-			console.log("Called deviation");
 			return oac().barchart(paper, x, y, width, height, data, labels, opts, labelopts);
 		},
 		linechart: function(paper, x, y, width, height, data, labels, opts, axisopts) {
 			opts = opts || {};
 			axisopts = axisopts || {};
 			var vgutter = opts.vgutter || 20,
-			    gutter  = opts.gutter  || 20,	
-			    xfrom   = 0,
-				xto     = labels.length-1 || undefined,
-				xsteps  = labels.length-1 || undefined;
+			    gutter  = opts.gutter  || 20,
+				xfrom, xto, xsteps;
 			
 			// make adjustments for vgutter that doesn't exist in line graphs
-			y -= vgutter/2;
-			height -= vgutter;
+			if( axisopts.noaxis !== true ) {
+				y -= vgutter/2;
+				height -= vgutter;
+			} else {
+				//y += vgutter/2;
+				//height += vgutter;
+			}
 			
 			var xdata = [],
 				l = data.length;
@@ -251,11 +253,17 @@
 			}
 			opts.smooth = false;
 			opts.symbol = "o";
-			opts.shade = true;
-			var xaxis = paper.g.axis(x+gutter, height+1, width-(gutter*2), xfrom, xto, xsteps, undefined, labels),
-				linegraph = paper.g.linechart(x,y,width,height,xdata, data, opts);
-			xaxis.text.attr(axisopts);
-			return { graph: linegraph, labels: xaxis.text };
+			opts.shade =  opts.shade === undefined ? true : opts.shade;
+			var linegraph = paper.g.linechart(x,y,width,height,xdata, data, opts),
+				xaxis;
+			if (axisopts.noaxis !== true) {
+				xfrom   = 0;
+				xto     = labels.length-1 || undefined;
+				xsteps  = labels.length-1 || undefined;
+				xaxis = paper.g.axis(x+gutter, height+1, width-(gutter*2), xfrom, xto, xsteps, undefined, labels);
+				xaxis.text.attr(axisopts);
+			}
+			return { graph: linegraph, labels: (axisopts.noaxis ? [] : xaxis.text), x: x, y: y, height: height, width: width };
 			
 		},
 		version: 0.1,
