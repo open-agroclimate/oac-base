@@ -121,12 +121,11 @@
 				
 				yto = Math.max(Math.abs(min), max);
 				yfrom = -yto;
-				ystep = 5;
-				
+				ysteps = 5;
 			}
 			
-			// Draw the axis and shift everything  up 
-			var	yaxis   = paper.g.axis(startx+gutter, gheight+vgutter+1, gheight-vgutter, yfrom, yto, ysteps, 1 ),
+			// Draw the axis and shift everything right
+			var	yaxis   = paper.g.axis(startx+gutter, gheight+vgutter+2, gheight-vgutter, yfrom, yto, ysteps, 1 ),
 				yaxisbb = yaxis.all.getBBox();
 				yaxis.all.translate(yaxisbb.width/2, 0);
 				startx += yaxisbb.width;
@@ -134,6 +133,9 @@
 			
 			gwidth -= startx;
 			gheight += vgutter*2;
+			
+			if ((chartFun == oac().deviationbarchart) && (Math.min.apply(null, data) === 0)) {
+			}
 			return chartFun( paper, startx, starty, gwidth, gheight, data, labels, chartOptions, axisOptions );
 			
 		},
@@ -158,7 +160,18 @@
 			return {graph: bargraph, labels: bargraph.labels, x: x, y: y, height: height, width: width, overlayxoffset: bargraph.bars[0].w/2};
 		},
 		deviationbarchart: function(paper, x, y, width, height, data, labels, opts, labelopts ) {
-			return oac().barchart(paper, x, y, width, height, data, labels, opts, labelopts);
+			var devchart = oac().barchart(paper, x, y, width, height, data, labels, opts, labelopts);
+			paper.path("M"+(x+7)+" "+(((height+opts.vgutter)/2)+3)+"l"+(width-opts.gutter)+"  0").toFront();
+			// hacky hacky - edge case deviation
+			if( Math.min.apply(Math, data) == 0 ) {
+				var l = devchart.graph.bars.length;
+				for( var i = 0; i < l; i++ ) {
+					if( devchart.graph.bars[i].attr().path !== "" ) {
+						devchart.graph.bars[i].scale(1, 0.5, 0, (y+(opts.vgutter/2)));
+					}
+				}
+			}
+			return devchart;
 		},
 		linechart: function(paper, x, y, width, height, data, labels, opts, axisopts) {
 			opts = opts || {};
