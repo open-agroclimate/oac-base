@@ -144,12 +144,9 @@ class Scope {
 	}
 
 	public function get_parent( $node_id ) {
-		echo "DEBUG: Looking for ".$node_id;
 		if( strlen( $node_id ) <= 1 ) {
-			echo "\nDEBUG: Parent is root\n";
 			return '';
 		} else {
-			echo "\DEBUG: Parent is ". substr( $node_id, 0, -2 )."\n";
 			return substr( $node_id, 0, -2 );
 		}
 	}
