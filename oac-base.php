@@ -322,6 +322,8 @@ class OACBaseAdmin {
 }
 
 // WordPress Hooks
+// Using a order number of 9 for OACBase to prevent
+// race conditions
 add_action( 'plugins_loaded', array( 'OACBase', 'init' ), 9 );
 register_activation_hook( __FILE__, array( 'OACBaseAdmin', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'OACBaseAdmin', 'deactivate' ) );
