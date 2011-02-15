@@ -7,22 +7,33 @@ class WPScoper {
 	public $name;  // Scope name. This should be unique within the WP deployment
 	public $scope; // Scope container
 	
-	function __construct( $scope_name, $autoload = true ) {
+	public function __construct( $scope_name, $autoload = true, $filter = null ) {
 		if( substr( $scope_name, 0, 10 ) != 'oac_scope_' )
 			$scope_name = 'oac_scope_'.$scope_name;
 		$this->name  = str_replace('-', '_', sanitize_title_with_dashes( $scope_name ) );
 		$this->scope = new Scope();
 		if ( $autoload ) {
-			$this->load();
+			$this->load( $filter );
 		}
+	}
+	
+	
+
+	/**
+	 * Filter the data in a scope. SHOULD ONLY BE USED BY PLUGINS.
+	 * Do not save the filtered data over the scope as it will destructively
+	 * erase your data.
+	 */
+	private function filtered_scope( $filter=array() ) {		
 	}
 	
 	/**
 	 * Loads the named scope into this instance.
 	 */
-	public function load() {
+	public function load( $filter = null) {
 		$data = get_option( $this->name, new Scope() );
-		$this->scope = $data; 
+		$this->scope = $data;
+		
 	} //function load()
 	
 	/**
