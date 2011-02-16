@@ -45,6 +45,10 @@ class OACBase {
 		
 		// WP_Scoper
 		require_once( 'scoper/wp-scoper.php' );
+
+		// mootools
+		wp_register_script( 'mootools-core', plugins_url( 'js/mootools-core.js', __FILE__ ) );
+		wp_register_script( 'mootools',      plugins_url( 'js/mootools-more.js', __FILE__ ) ); 
 		
 		// raphaeljs/gRapahel script setup.
 		wp_register_script( 'raphaeljs', plugins_url( 'js/raphael.js', __FILE__ ) );
@@ -56,7 +60,6 @@ class OACBase {
 		wp_register_script( 'wp-scoper', plugins_url( 'js/wp-scoper-js.php', __FILE__ ), array( 'jquery' ) );
 		
 		// CSS styles registration
-		wp_register_style( 'jquery-ui', plugins_url( 'js/jquery-ui/themes/base/jquery-ui.css', __FILE__ ) );
 		wp_register_style( 'oacbase',   plugins_url( 'css/oac-base.css', __FILE__ ) );
 		
 		self::$units = array('Metric'=>array(
