@@ -6,6 +6,7 @@ require_once( 'csv-scope-loader.php' );
 class WPScoper {
 	public $name;  // Scope name. This should be unique within the WP deployment
 	public $scope; // Scope container
+	public $filtered; // Marker to show this is a filtered scope
 	
 	public function __construct( $scope_name, $autoload = true, $filter = null ) {
 		if( substr( $scope_name, 0, 10 ) != 'oac_scope_' )
@@ -24,7 +25,31 @@ class WPScoper {
 	 * Do not save the filtered data over the scope as it will destructively
 	 * erase your data.
 	 */
-	private function filtered_scope( $filter=array() ) {		
+	private function filter_scope( $filter=array() ) {
+		for( $i = 0; $i < count( $filter ); $i++ ) {
+			$lineage = '';
+			$heratage = explode('_', $filter[$i]);
+			if( count( $heratage ) == 1 ) {
+				continue;
+			} else {
+				array_pop($heratage);
+				$lineage = array_shift( $heratage );
+				$filter[] = $lineage;
+				while( count( $heratage != 0 ) ) {
+					$lineage .= '_'.array_shift( $heratage );
+					$filter[] = $lineage;
+				}
+			}
+		}
+		$remove = array_diff_key( $this->scope->data, $filter );
+		if( count($remove) == count( $this->scope->data ) ) {
+			return false;
+		}
+		$remove = array_keys( $remove );
+		for( $i = 0; $i < count($remove); $i++ ) {
+			$this->scope->remove_node( $remove[$i] );
+		}
+		return true;
 	}
 	
 	/**
@@ -33,6 +58,9 @@ class WPScoper {
 	public function load( $filter = null) {
 		$data = get_option( $this->name, new Scope() );
 		$this->scope = $data;
+		if( is_array( $filter ) ) {
+			$this->filtered = $this->filter_scope( $filter );
+		}
 		
 	} //function load()
 	
@@ -40,7 +68,8 @@ class WPScoper {
 	 * Saves this instance of the scope to the appropriate WordPress option
 	 */
 	public function save() {
-		update_option( $this->name, $this->scope );
+		if( ! $this->filtered )
+			update_option( $this->name, $this->scope );
 	} //function save()
 	
 	/**
