@@ -48,7 +48,7 @@ class OACBase {
 
 		// mootools
 		wp_register_script( 'mootools-core', plugins_url( 'js/mootools-core.js', __FILE__ ) );
-		wp_register_script( 'mootools',      plugins_url( 'js/mootools-more.js', __FILE__ ) ); 
+		wp_register_script( 'mootools',      plugins_url( 'js/mootools-more.js', __FILE__ ), array('mootools-core') ); 
 		
 		// raphaeljs/gRapahel script setup.
 		wp_register_script( 'raphaeljs', plugins_url( 'js/raphael.js', __FILE__ ) );
@@ -56,9 +56,8 @@ class OACBase {
 		wp_register_script( 'grpie',     plugins_url( 'js/graphael/g.pie.js', __FILE__ ), array('raphaeljs', 'graphael') );
 		wp_register_script( 'grbar',     plugins_url( 'js/graphael/g.bar.js', __FILE__), array('raphaeljs', 'graphael' ) );
 		wp_register_script( 'grline',    plugins_url( 'js/graphael/g.line.js', __FILE__), array('raphaeljs', 'graphael' ) );
-		wp_register_script( 'oaclib',    plugins_url( 'js/oaclib.js', __FILE__ ), array( 'jquery','graphael' ) );
-		wp_register_script( 'wp-scoper', plugins_url( 'js/wp-scoper-js.php', __FILE__ ), array( 'jquery' ) );
-		
+		//wp_register_script( 'oaclib',    plugins_url( 'js/oaclib.js', __FILE__ ), array( 'jquery','graphael' ) );
+		wp_register_script( 'oac-base',  plugins_url( 'js/oac-base.js', __FILE__), array('mootools') );
 		// CSS styles registration
 		wp_register_style( 'oacbase',   plugins_url( 'css/oac-base.css', __FILE__ ) );
 		
