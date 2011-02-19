@@ -47,8 +47,9 @@ class OACBase {
 		require_once( 'scoper/wp-scoper.php' );
 
 		// mootools
-		wp_register_script( 'mootools-core', plugins_url( 'js/mootools-core.js', __FILE__ ) );
-		wp_register_script( 'mootools',      plugins_url( 'js/mootools-more.js', __FILE__ ), array('mootools-core') ); 
+		wp_register_script( 'mootools-core',       plugins_url( 'js/mootools/mootools-core.js', __FILE__ ) );
+		wp_register_script( 'mootools',            plugins_url( 'js/mootools/mootools-more.js', __FILE__ ), array('mootools-core') );
+		wp_register_script( 'mootools-array-math', plugins_url( 'js/mootools/Array.Math.js',    __FILE__ ), array('mootools-core'));
 		
 		// raphaeljs/gRapahel script setup.
 		wp_register_script( 'raphaeljs', plugins_url( 'js/raphael.js', __FILE__ ) );
