@@ -114,7 +114,7 @@ class WPScoper {
 
 			// Are there any descendents of a SELECTED item?
 
-			$dropdown .= '<select id="wp-scoper-'.$this->name.'-'.$label.'" class="oac-input oac-select wp-scoper-select wp-scoper-select-';
+			$dropdown .= '<select id="'.$this->name.'-'.$label.'" class="oac-input oac-select wp-scope wp-scope-';
 			$dropdown .= ( count( $this->scope->meta ) == $this->scope->get_depth( $path )+1 ) ? 'final' : 'linked'; 
 			$dropdown .= '" name="scope_select_'.$label."\">\n";
 			$dropdown .= $this->populateDDL( $path );
@@ -124,7 +124,7 @@ class WPScoper {
 	}
 
 	public function generateNestedDDL( $starting_path='', $display_label=false ) {
-		$nested = '';
+		$nested = '<div id="'.$this->name.'">';
 		$children = $this->scope->get_children( $starting_path );
 		if( count( $children != 0 ) ) {
 			$nested .= $this->generateDDL( $starting_path, $display_label );
@@ -134,6 +134,7 @@ class WPScoper {
 			$nested .= $this->generateDDL( $first_child_path, $display_label );
 			$children = $this->scope->get_children( $first_child_path );
 		}
+		$nested .= "</div>\n";
 		return $nested;
 	}		
 		

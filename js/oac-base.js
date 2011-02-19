@@ -46,11 +46,11 @@ var OACScope = new Class({
 	Implements: [Options],
 	
 	options: {
-		handler       : (''.toURI().get('directory'))+'handler.php',
-		scope         : '',
-		element       : undefined,
-		attachToClass : '.wp-scope',
-		finalClass    : '.wp-scope-final'
+		handler     : (($$('script[src*="oac-base.js"]')[0].getProperty('src').toURI().get('directory'))+'../scoper/wp-scoper-ajax.php').toURI().toString(),
+		scope       : '',
+		element     : undefined,
+		parentClass : '.wp-scope-linked',
+		finalClass  : '.wp-scope-final'
 	},
 	
 	// Controls the flow of events for this scope. Can be isolated from
@@ -74,7 +74,8 @@ var OACScope = new Class({
 			onFailure: function()  { alert('There is a problem. Please contact the system administrator.'); },
 		});
 		this.finalElement = this.options.element.getElement(this.options.finalClass);
-		this.options.element.getElements(this.options.attachToClass+':not('+this.options.finalClass+')').addEvent('change', this.bound.parentSelect);
+		var parentElements = this.options.element.getElements(this.options.parentClass);
+		parentElements === undefined ? undefined : parentElements.addEvent('change', this.bound.parentSelect);
 		this.finalElement.addEvent('change', this.bound.finalSelect);
 	},
 	
