@@ -48,7 +48,7 @@ var OACScope = new Class({
 	options: {
 		handler     : (($$('script[src*="oac-base.js"]')[0].getProperty('src').toURI().get('directory'))+'../scoper/wp-scoper-ajax.php').toURI().toString(),
 		scope       : '',
-		element     : undefined,
+		element     : null,
 		parentClass : '.wp-scope-linked',
 		finalClass  : '.wp-scope-final'
 	},
@@ -101,3 +101,24 @@ var OACScope = new Class({
 		this.finalQueue.go();
 	},
 });
+
+var OACGraph = new Class({
+	Implements: [Options],
+	
+	options: {
+		element: null
+		type: 'bargraph',
+		overlay: null,
+		x: 0,
+		y: 0,
+		height: 300,
+		width: 400
+	},
+	
+	initialize: function(opts) {
+		this.setOptions(opts);
+		if( typeOf(this.options.element) !== 'element' ) return;
+		this.element = this.options.element;
+		this.paper = Raphael(this.element, this.options.width, this.options.height);
+	}
+})

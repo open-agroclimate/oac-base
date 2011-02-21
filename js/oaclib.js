@@ -76,7 +76,7 @@
 			var	vgutter     = chartOptions.vgutter || 20,
 				gutter      = parseFloat(chartOptions.gutter || "20%"),
 				isbar       = ( chartFun === this.barchart ) ? true : false,
-				yfrom       = axisOptions.from || 0,
+				yfrom       = axisOptions.from || Math.min.apply(null, data),
 				yto         = axisOptions.to   || Math.max.apply(null, data),
 				ysteps      = axisOptions.step || 10,
 				startx      = 0,
