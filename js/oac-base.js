@@ -112,7 +112,10 @@ var OACGraph = new Class({
 		x: 0,
 		y: 0,
 		height: 300,
-		width: 400
+		width: 400,
+		graphOptions: {},
+		chartOptions: {},
+		axisOptions : {}
 	},
 	
 	initialize: function(opts) {
