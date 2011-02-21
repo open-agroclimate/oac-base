@@ -47,9 +47,10 @@ class OACBase {
 		require_once( 'scoper/wp-scoper.php' );
 
 		// mootools
-		wp_register_script( 'mootools-core',       plugins_url( 'js/mootools/mootools-core.js', __FILE__ ) );
-		wp_register_script( 'mootools',            plugins_url( 'js/mootools/mootools-more.js', __FILE__ ), array('mootools-core') );
-		wp_register_script( 'mootools-array-math', plugins_url( 'js/mootools/Array.Math.js',    __FILE__ ), array('mootools-core'));
+		wp_register_script( 'mootools-core',         plugins_url( 'js/mootools/mootools-core.js',       __FILE__ ) );
+		wp_register_script( 'mootools',              plugins_url( 'js/mootools/mootools-more.js',       __FILE__ ), array( 'mootools-core' ) );
+		wp_register_script( 'mootools-array-math',   plugins_url( 'js/mootools/Array.Math.js',          __FILE__ ), array( 'mootools-core' ) );
+		wp_register_script( 'mootools-table-colsel', plugins_url( 'js/mootools/HtmlTable.ColSelect.js', __FILE__ ), array( 'mootools' ) );
 		
 		// raphaeljs/gRapahel script setup.
 		wp_register_script( 'raphaeljs', plugins_url( 'js/raphael.js', __FILE__ ) );
