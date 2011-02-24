@@ -106,22 +106,192 @@ var OACGraph = new Class({
 	Implements: [Options],
 	
 	options: {
-		element: null
+		linkpaper: false,
+		linkedpaper: null,
+		element: null,
 		type: 'bargraph',
-		overlay: null,
 		x: 0,
 		y: 0,
 		height: 300,
 		width: 400,
+		min: 0,
+		max: 100,
+		labels: undefined,
+		overlay: {},
 		graphOptions: {},
-		chartOptions: {},
-		axisOptions : {}
+		chartOptions: {
+			vgutter: 20,
+			gutter: 20,
+		},
+		axisOptions: {}
 	},
+	
+	rescale: true,
 	
 	initialize: function(opts) {
 		this.setOptions(opts);
-		if( typeOf(this.options.element) !== 'element' ) return;
+		if( (typeOf(this.options.element) !== 'element') && (this.options.linkedpaper === null ) ) return;
 		this.element = this.options.element;
-		this.paper = Raphael(this.element, this.options.width, this.options.height);
+		if(this.options.linkpaper) {
+			if (this.options.linkedpaper !== null) {
+				this.paper = this.options.linkedpaper;
+			} else {
+				this.paper = this.options.linkedpaper = Raphael(this.element, this.options.width, this.options.height);
+			}
+		} else {
+			this.paper = Raphael(this.element, this.options.width, this.options.height);
+		}
+	},
+	
+	redraw: function( data, displaylabels, labels, x, y, width, height ) {
+		/* vgutter     = chartOptions.vgutter || 20,
+			gutter      = parseFloat(chartOptions.gutter || "20%"),
+			isbar       = ( chartFun === this.barchart ) ? true : false,
+			yfrom       = axisOptions.from || Math.min.apply(null, data),
+			yto         = axisOptions.to   || Math.max.apply(null, data),
+			ysteps      = axisOptions.step || 10, */
+		x = x || 0;
+		y = y || 0;
+		width = width || this.paper.width;
+		height = height || this.paper.height;
+		displaylabels = displaylabels || false;
+		labels = labels || this.options.labels;
+		var	gutter  = this.options.chartOptions.gutter,
+			vgutter = this.options.chartOptions.vgutter,
+			startx  = x,
+			starty  = y,
+			gwidth  = width,
+			gheight = height,
+			yfrom   = this.options.axisOptions.from || ( this.options.min > 0 ) ? 0 : this.options.min,
+			yto     = this.options.axisOptions.to   || this.options.max,
+			ysteps  = this.options.axisOptions.step || 10,
+			graphtitle, xlabel, ylabel, chart, chartx, charty, charth, chartw;
+		
+		this.options.chartOptions.to = yto;
+		this.options.chartOptions.from = yfrom;
+		this.paper.clear();
+		
+		// Add the title, shifting everything down
+		if (this.options.graphOptions.title !== undefined ) {
+			graphtitle = this.paper.text( width/2, y, this.options.graphOptions.title );
+			graphtitle.attr({'font-size': 19 });
+			gtbb = graphtitle.getBBox();
+			graphtitle.attr({y: y+gtbb.height/1.75 });
+			starty = gtbb.height/1.75+vgutter;
+			gheight -= starty;
+		}
+	
+		// Add an xlabel, squishing everything up
+		if( this.options.graphOptions.xlabel !== undefined ) {
+			xlabel = this.paper.text( width/2, height, this.options.graphOptions.xlabel );
+			xlabel.attr({'font-size': 14 });
+			xlbb = xlabel.getBBox();
+			xlabel.attr({y: height-(xlbb.height/1.5)-vgutter/2 });
+			gheight -= xlbb.height+vgutter*2;
+		}
+	
+		// Add a ylabel, shifting everything to the right (RTL must be made later)
+		if( this.options.graphOptions.ylabel !== undefined ) {
+			ylabel = this.paper.text( x, gheight/2, this.options.graphOptions.ylabel+(this.options.graphOptions.yunits ? " ("+this.options.graphOptions.yunits+")" : "") );
+			ylabel.attr({'font-size': 14 });
+			ylbb = ylabel.getBBox();
+			ylabel.attr({rotation: -90, x: x+ylbb.height/1.5+gutter/2});
+			startx = startx + ylbb.height+gutter;
+		}
+		
+		// Draw the axis and shift everything right
+		var	yaxis   = this.paper.g.axis(startx+gutter, gheight+vgutter+2, gheight-vgutter, yfrom, yto, ysteps, 1 ),
+			yaxisbb = yaxis.all.getBBox();
+			yaxis.all.translate(yaxisbb.width/2, 0);
+			startx += yaxisbb.width;
+			
+		
+		gwidth -= startx;
+		gheight += vgutter*2;
+		
+		starty = starty - vgutter;
+		
+		chartx = startx+gutter, charty = starty+vgutter/2, chartw = gwidth-(gutter*2), charth = gheight-vgutter;
+		chart = this.paper.g.barchart(chartx, charty, chartw, charth, [data], this.options.chartOptions);
+		if(labels) {
+		    chart.label([this.options.labels], true, true);
+		}
+		
+		this.chart = {chart: chart, x: chartx, y: charty, w: chartw, h: charth};
+	},
+	
+	draw: function(data) {
+	    if (!this.chart) return;
+	    this.chart.chart.remove();
+	    this.chart.chart = this.paper.g.barchart(this.chart.x, this.chart.y, this.chart.w, this.chart.h, [data], this.options.chartOptions);
 	}
-})
+});
+
+
+// Fuzzy Array Slicing
+(function(nil){
+    Array.implement({
+        fuzzyltrim: function(value, times) {
+            if( value === undefined || value === null ) return this;
+            if(this[0] !== value ) return this;
+            times = times || 0;
+            var i = 0;
+            while(this[i++] === value);
+            if( --i > times ) return this.slice(i-times);
+            return this;
+        },
+        
+        fuzzyrtrim: function(value, times) {
+            if( value === undefined  || value === null ) return this;
+            if(this.getLast() !== value ) return this;
+            times = times || 0;
+            var i = len = this.length;
+            while(this[--i] === value);
+            if(len-(++i) > times) return this.slice(0,i+times);
+            return this;
+        },
+        
+        fuzzytrim: function(value, times) {
+            return this.fuzzyltrim(value, times).fuzzyrtrim(value, times);
+        },
+        
+        intelfuzzyltrim: function(value, times) {
+            if( value === undefined || value === null ) return {data: this, index: null};
+            if(this[0] !== value ) return {data: this, index: null};
+            times = times || 0;
+            var i = 0;
+            while(this[i++] === value);
+            if( --i > times ) return {data: this.slice(i-times), index: i-times};
+            return {data: this, index: null};
+        },
+        
+        intelfuzzyrtrim: function(value, times) {
+            if( value === undefined  || value === null ) return {data: this, index: null};
+            if(this.getLast() !== value ) return {data: this, index: null};
+            times = times || 0;
+            var i = len = this.length;
+            while(this[--i] === value);
+            if(len-(++i) > times) return {data: this.slice(0,i+times), index: i+times};
+            return {data: this, index: null};
+        },
+        
+        intelfuzzytrim: function(value, times) {
+            var a = this.intelfuzzyltrim(value, times),
+                b = a.data.intelfuzzyrtrim(value,times);
+            return {data: b.data, index: [a.index, a.index+b.index] };
+        },
+        
+        intelclean: function(replacement) {
+            replacement = (replacement === undefined ) ? null : replacement;
+            var l = this.length,
+                remove = [];
+            for(var i = 0; i < l; i++) {
+                if( Number.from(this[i]) === null ) {
+                    remove.push(i);
+                    this[i] = replacement;
+                }
+            }
+            return {data: this, removed: remove};
+        }
+    });
+}).call(this);
