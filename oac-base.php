@@ -207,11 +207,11 @@ class OACBase {
 	static public function display_enso_selector( $phases_only = false ) {
 		$current_phase_id = substr( self::get_current_enso_phase(), 0, 1 );
 		$output = '<ul id="enso-select">';
-		$output .= '<li class="neutral oac-enso-1 highlight"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral' ).'</li>';
-		$output .= '<li class="elnino oac-enso-2 highlight"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o' ).'</li>';
-		$output .= '<li class="lanina oac-enso-3 highlight"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a' ).'</li>';
+		$output .= '<li class="neutral oac-enso-1"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral' ).'</li>';
+		$output .= '<li class="elnino oac-enso-2"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o' ).'</li>';
+		$output .= '<li class="lanina oac-enso-3"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a' ).'</li>';
 		if ( ! $phases_only )
-			$output .= '<li class="allYears oac-enso-4 highlight"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4">'.__( 'All Years' ).'</li>';
+			$output .= '<li class="allYears oac-enso-4"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4">'.__( 'All Years' ).'</li>';
 		$output .= '</ul>';
 		return $output;
 	}
