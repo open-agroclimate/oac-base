@@ -132,6 +132,7 @@ var OACGraph = new Class({
 		this.setOptions(opts);
 		if( (typeOf(this.options.element) !== 'element') && (this.options.linkedpaper === null ) ) return;
 		this.element = this.options.element;
+		console.log(this.options.type);
 		if(this.options.linkpaper) {
 			if (this.options.linkedpaper !== null) {
 				this.paper = this.options.linkedpaper;
@@ -210,10 +211,10 @@ var OACGraph = new Class({
 		gheight += vgutter*2;
 		
 		starty = starty - vgutter;
-		
 		chartx = startx+gutter, charty = starty+vgutter/2, chartw = gwidth-(gutter*2), charth = gheight-vgutter;
-		chart = this.paper.g.barchart(chartx, charty, chartw, charth, [data], this.options.chartOptions);
-		if(labels) {
+		console.log(this.options.type);
+		chart = this[this.options.type](chartx, charty, chartw, charth, undefined, [data], this.options.chartOptions);
+		if(labels && this.type === 'barchart') {
 		    chart.label([this.options.labels], true, true);
 		}
 		
@@ -223,7 +224,7 @@ var OACGraph = new Class({
 	draw: function(data) {
 	    if (!this.chart) return;
 	    this.chart.chart.remove();
-	    this.chart.chart = this.paper.g.barchart(this.chart.x, this.chart.y, this.chart.w, this.chart.h, [data], this.options.chartOptions);
+	    this.chart.chart = this[this.options.type](this.chart.x, this.chart.y, this.chart.w, this.chart.h, undefined, [data], this.options.chartOptions);
 	}
 });
 

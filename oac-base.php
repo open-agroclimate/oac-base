@@ -59,7 +59,9 @@ class OACBase {
 		wp_register_script( 'grbar',     plugins_url( 'js/graphael/g.bar.js', __FILE__), array('raphaeljs', 'graphael' ) );
 		wp_register_script( 'grline',    plugins_url( 'js/graphael/g.line.js', __FILE__), array('raphaeljs', 'graphael' ) );
 		//wp_register_script( 'oaclib',    plugins_url( 'js/oaclib.js', __FILE__ ), array( 'jquery','graphael' ) );
-		wp_register_script( 'oac-base',  plugins_url( 'js/oac-base.js', __FILE__), array('mootools') );
+		wp_register_script( 'oac-base',      plugins_url( 'js/oac-base.js',      __FILE__ ), array( 'mootools' ) );
+		wp_register_script( 'oac-barchart',  plugins_url( 'js/oac-barchart.js',  __FILE__ ), array( 'oac-base', 'grbar' ) );
+		wp_register_script( 'oac-linechart', plugins_url( 'js/oac-linechart.js', __FILE__ ), array( 'oac-base', 'grline' ) );
 		// CSS styles registration
 		wp_register_style( 'oacbase',   plugins_url( 'css/oac-base.css', __FILE__ ) );
 		
