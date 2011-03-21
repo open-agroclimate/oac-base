@@ -45,6 +45,12 @@ class OACBase {
 		
 		// WP_Scoper
 		require_once( 'scoper/wp-scoper.php' );
+
+		// mootools
+		wp_register_script( 'mootools-core',         plugins_url( 'js/mootools/mootools-core.js',       __FILE__ ) );
+		wp_register_script( 'mootools',              plugins_url( 'js/mootools/mootools-more.js',       __FILE__ ), array( 'mootools-core' ) );
+		wp_register_script( 'mootools-array-math',   plugins_url( 'js/mootools/Array.Math.js',          __FILE__ ), array( 'mootools-core' ) );
+		wp_register_script( 'mootools-table-colsel', plugins_url( 'js/mootools/HtmlTable.ColSelect.js', __FILE__ ), array( 'mootools' ) );
 		
 		// raphaeljs/gRapahel script setup.
 		wp_register_script( 'raphaeljs', plugins_url( 'js/raphael.js', __FILE__ ) );
@@ -52,11 +58,11 @@ class OACBase {
 		wp_register_script( 'grpie',     plugins_url( 'js/graphael/g.pie.js', __FILE__ ), array('raphaeljs', 'graphael') );
 		wp_register_script( 'grbar',     plugins_url( 'js/graphael/g.bar.js', __FILE__), array('raphaeljs', 'graphael' ) );
 		wp_register_script( 'grline',    plugins_url( 'js/graphael/g.line.js', __FILE__), array('raphaeljs', 'graphael' ) );
-		wp_register_script( 'oaclib',    plugins_url( 'js/oaclib.js', __FILE__ ), array( 'jquery','graphael' ) );
-		wp_register_script( 'wp-scoper', plugins_url( 'js/wp-scoper-js.php', __FILE__ ), array( 'jquery' ) );
-		
+		//wp_register_script( 'oaclib',    plugins_url( 'js/oaclib.js', __FILE__ ), array( 'jquery','graphael' ) );
+		wp_register_script( 'oac-base',      plugins_url( 'js/oac-base.js',      __FILE__ ), array( 'mootools' ) );
+		wp_register_script( 'oac-barchart',  plugins_url( 'js/oac-barchart.js',  __FILE__ ), array( 'oac-base', 'grbar' ) );
+		wp_register_script( 'oac-linechart', plugins_url( 'js/oac-linechart.js', __FILE__ ), array( 'oac-base', 'grline' ) );
 		// CSS styles registration
-		wp_register_style( 'jquery-ui', plugins_url( 'js/jquery-ui/themes/base/jquery-ui.css', __FILE__ ) );
 		wp_register_style( 'oacbase',   plugins_url( 'css/oac-base.css', __FILE__ ) );
 		
 		self::$units = array('Metric'=>array(
@@ -203,11 +209,11 @@ class OACBase {
 	static public function display_enso_selector( $phases_only = false ) {
 		$current_phase_id = substr( self::get_current_enso_phase(), 0, 1 );
 		$output = '<ul id="enso-select">';
-		$output .= '<li class="neutral oac-enso-1 highlight"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral' ).'</li>';
-		$output .= '<li class="elnino oac-enso-2 highlight"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o' ).'</li>';
-		$output .= '<li class="lanina oac-enso-3 highlight"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a' ).'</li>';
+		$output .= '<li class="neutral oac-enso-1"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral' ).'</li>';
+		$output .= '<li class="elnino oac-enso-2"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o' ).'</li>';
+		$output .= '<li class="lanina oac-enso-3"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a' ).'</li>';
 		if ( ! $phases_only )
-			$output .= '<li class="allYears oac-enso-4 highlight"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4">'.__( 'All Years' ).'</li>';
+			$output .= '<li class="allYears oac-enso-4"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4">'.__( 'All Years' ).'</li>';
 		$output .= '</ul>';
 		return $output;
 	}
@@ -217,7 +223,16 @@ class OACBase {
 	
 	static public function knsort( $array ) {
 		$keys = array_keys($array);
+		
 	    natsort($keys);
+		
+		// Fix the -number gotcha
+		$i = 0;
+		$resort = array();
+		while(substr($keys[$i], 0, 1) == '-' ) {
+		    array_unshift($resort, array_shift($keys));
+		}
+		$keys = array_merge($resort, $keys);
 		
 		$new_array = array();
 	    foreach ($keys as $k)

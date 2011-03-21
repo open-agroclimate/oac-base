@@ -1,15 +1,69 @@
-.oac-enso-1.highlight {
+li.oac-enso-1 {
 	background-color: #00ff66;
 }
 
-.oac-enso-2.highlight {
+li.oac-enso-2 {
 	background-color: #ff6666;
 }
 
-.oac-enso-3.highlight {
+li.oac-enso-3 {
 	background-color: #00ccff;
 }
 
-.oac-enso-4.highlight {
+li.oac-enso-4 {
 	background-color: #808080;
+}
+
+table.oac-enso-1 .oac-data-selected {
+	background-color: #0f6;
+}
+
+table.oac-enso-2 .oac-data-selected {
+	background-color: #f66;
+}
+
+table.oac-enso-3 .oac-data-selected {
+	background-color: #0cf;
+}
+
+table.oac-enso-4 .oac-data-selected {
+	background-color: #f2f1df;
+}
+
+#tabs {
+    border-bottom: 1px solid #DDD;
+    height: 33px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#tabs li {
+        cursor: pointer;
+        float: left;
+        font: bold 1em/18px Helvetica, Arial, sans-serif;
+        margin: 0 0 0 5px;
+        text-align: center;
+        background: #F4F5F5;
+        background: -moz-linear-gradient(top, #FDFDFD, #F4F5F5);
+        background: -webkit-gradient(linear, left top, left bottom, from(#FDFDFD), to(#F4F5F5));
+        border: 1px solid #CCC;
+        border-bottom: none;
+        color: #777;
+        filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#FDFDFD', EndColorStr='#F4F5F5');
+        padding: 8px 4px 0 4px;
+        height: 24px;
+/*        width: 74px; */
+        -moz-border-radius-topleft: 6px;
+        -moz-border-radius-topright: 6px;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+}
+
+.tabcontent {
+    display: none;
+}
+
+.tabcontent.selected {
+    display: block;
 }

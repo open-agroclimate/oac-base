@@ -1,6 +1,12 @@
 <?php
-$wp_root = explode('wp-content', $_SERVER['SCRIPT_FILENAME']);
-require_once( $wp_root[0].'wp-blog-header.php' );
+// Load WP necessities
+$wp_root = explode('wp-content', __FILE__);
+$wp_root = $wp_root[0];
+
+
+if( file_exists( $wp_root.'wp-load.php' ) ) {
+	require_once( $wp_root.'wp-load.php' );
+}
 require_once( '../scoper/wp-scoper.php' );
 
 if( isset( $_GET['action'] ) ) {
