@@ -37,7 +37,7 @@ HtmlTable = Class.refactor(HtmlTable, {
 	},
 	
 	selectColumnByIndex: function(col) {
-	    _selectedCol = this.element.getElements('tr td:nth-child('+col+')');
+	    _selectedCol = this.element.getElements('tr td:nth-child('+(col+1)+')');
 	    _selectedCol.addClass(this.options.classColSelected);
 	    this.fireEvent('colFocus', [col, _selectedCol]); 
 	}

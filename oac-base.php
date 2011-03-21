@@ -223,7 +223,16 @@ class OACBase {
 	
 	static public function knsort( $array ) {
 		$keys = array_keys($array);
+		
 	    natsort($keys);
+		
+		// Fix the -number gotcha
+		$i = 0;
+		$resort = array();
+		while(substr($keys[$i], 0, 1) == '-' ) {
+		    array_unshift($resort, array_shift($keys));
+		}
+		$keys = array_merge($resort, $keys);
 		
 		$new_array = array();
 	    foreach ($keys as $k)

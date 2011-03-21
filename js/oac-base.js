@@ -229,8 +229,15 @@ var OACGraph = new Class({
 		if(labels && ((this.options.type === 'barchart') || (this.options.type === 'deviationbarchart'))) {
 		    chart.label([this.options.labels], true, -45);
 		}
-		if( this.options.type == 'barchart')
-    		this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(charty+charth-vgutter)+" L"+(chartw+chartx)+" "+(charty+charth-vgutter));
+		if( this.options.type == 'barchart') {
+		    if (this.options.min < 0) {
+		        var unith = (chart.bars[0][0].h)/(chart.bars[0][0].value),
+		            liney = Math.abs(this.options.min) * unith;
+		        this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(charty+charth-vgutter-liney)+" L"+(chartw+chartx)+" "+(charty+charth-vgutter-liney));
+	        } else {
+        		this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(charty+charth-vgutter)+" L"+(chartw+chartx)+" "+(charty+charth-vgutter));
+        	}
+        }
     	else if( this.options.type == 'deviationbarchart' ) {
     	    this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(((charty+charth)/2)+(vgutter/2)+1)+" L"+chartw+chartx+" "+((charty+charth)/2));
     	} else if ( this.options.type == 'linechart' ) {
@@ -331,3 +338,17 @@ var OACGraph = new Class({
         }
     });
 }).call(this);
+
+// Simple tabs - because everything else is too much (ripped from Mootools.net)
+function simpleTabs( tabs, content, callback ) {
+    tabs.each(function(tab, index){
+        tab.addEvent('click', function(){
+            tabs.removeClass('selected');
+            content.removeClass('selected');
+            tabs[index].addClass('selected');
+            content[index].addClass('selected');
+            callback(index);
+            //for (var name in editors) if (editors.hasOwnProperty(name)) editors[name].setDynamicHeight();
+        });
+    });
+}
