@@ -34,5 +34,14 @@ HtmlTable = Class.refactor(HtmlTable, {
 		_selectedCol = this.element.getElements('tr td:nth-child('+(index+1)+')');
 		_selectedCol.addClass(this.options.classColSelected);
 		this.fireEvent('colFocus', [index, _selectedCol] );
+	},
+	
+	selectColumnByIndex: function(col) {
+	    _selectedCol = this.element.getElements('tr td:nth-child('+col+')');
+	    _selectedCol.addClass(this.options.classColSelected);
+	    this.fireEvent('colFocus', [col, _selectedCol]); 
 	}
 });
+
+// TODO: Optimize for already selected issues.
+// TODO: Add ignorecols option

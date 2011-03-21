@@ -132,7 +132,6 @@ var OACGraph = new Class({
 		this.setOptions(opts);
 		if( (typeOf(this.options.element) !== 'element') && (this.options.linkedpaper === null ) ) return;
 		this.element = this.options.element;
-		console.log(this.options.type);
 		if(this.options.linkpaper) {
 			if (this.options.linkedpaper !== null) {
 				this.paper = this.options.linkedpaper;
@@ -144,13 +143,17 @@ var OACGraph = new Class({
 		}
 	},
 	
+	hoverfin: function() {
+	    var point = this.bar || this || undefined;
+	    if (point === undefined ) return;
+	    this.tag = this.paper.g.popup(point.x, point.y, point.value || "0").insertBefore(this).toFront();
+	},
+	
+	hoverfout: function() {
+	    this.tag.remove();    
+	},
+	
 	redraw: function( data, displaylabels, labels, x, y, width, height ) {
-		/* vgutter     = chartOptions.vgutter || 20,
-			gutter      = parseFloat(chartOptions.gutter || "20%"),
-			isbar       = ( chartFun === this.barchart ) ? true : false,
-			yfrom       = axisOptions.from || Math.min.apply(null, data),
-			yto         = axisOptions.to   || Math.max.apply(null, data),
-			ysteps      = axisOptions.step || 10, */
 		x = x || 0;
 		y = y || 0;
 		width = width || this.paper.width;
@@ -163,19 +166,27 @@ var OACGraph = new Class({
 			starty  = y,
 			gwidth  = width,
 			gheight = height,
-			yfrom   = this.options.axisOptions.from || ( this.options.min > 0 ) ? 0 : this.options.min,
+			yfrom   = this.options.axisOptions.from || ( this.options.min > 0 ) ? 0 : Math.floor(this.options.min),
 			yto     = this.options.axisOptions.to   || this.options.max,
 			ysteps  = this.options.axisOptions.step || 10,
-			graphtitle, xlabel, ylabel, chart, chartx, charty, charth, chartw;
+			graphtitle, xlabel, ylabel, chart, chartx, charty, charth, chartw, minmax;
+		
+		if( this.options.type == 'deviationbarchart' ) {
+		    minmax = Math.max(yto, Math.abs(yfrom));
+		    yto = minmax;
+		    yfrom = -minmax;
+		}
 		
 		this.options.chartOptions.to = yto;
 		this.options.chartOptions.from = yfrom;
 		this.paper.clear();
 		
+		
+		
 		// Add the title, shifting everything down
 		if (this.options.graphOptions.title !== undefined ) {
 			graphtitle = this.paper.text( width/2, y, this.options.graphOptions.title );
-			graphtitle.attr({'font-size': 19 });
+			graphtitle.attr({'font-size': 16 });
 			gtbb = graphtitle.getBBox();
 			graphtitle.attr({y: y+gtbb.height/1.75 });
 			starty = gtbb.height/1.75+vgutter;
@@ -185,16 +196,18 @@ var OACGraph = new Class({
 		// Add an xlabel, squishing everything up
 		if( this.options.graphOptions.xlabel !== undefined ) {
 			xlabel = this.paper.text( width/2, height, this.options.graphOptions.xlabel );
-			xlabel.attr({'font-size': 14 });
+			xlabel.attr({'font-size': 12 });
 			xlbb = xlabel.getBBox();
 			xlabel.attr({y: height-(xlbb.height/1.5)-vgutter/2 });
 			gheight -= xlbb.height+vgutter*2;
 		}
 	
+	    // Need to rescale for the labels
+	    gheight = (gheight/10)*9;
 		// Add a ylabel, shifting everything to the right (RTL must be made later)
 		if( this.options.graphOptions.ylabel !== undefined ) {
 			ylabel = this.paper.text( x, gheight/2, this.options.graphOptions.ylabel+(this.options.graphOptions.yunits ? " ("+this.options.graphOptions.yunits+")" : "") );
-			ylabel.attr({'font-size': 14 });
+			ylabel.attr({'font-size': 12 });
 			ylbb = ylabel.getBBox();
 			ylabel.attr({rotation: -90, x: x+ylbb.height/1.5+gutter/2});
 			startx = startx + ylbb.height+gutter;
@@ -208,28 +221,50 @@ var OACGraph = new Class({
 			
 		
 		gwidth -= startx;
-		gheight += vgutter*2;
+		gheight += (vgutter*2)+3;
 		
 		starty = starty - vgutter;
-		chartx = startx+gutter, charty = starty+vgutter/2, chartw = gwidth-(gutter*2), charth = gheight-vgutter;
-		console.log(this.options.type);
+		chartx = (this.options.type=='linechart') ? startx-(gutter/2)-2 : startx+gutter, charty = starty+vgutter/2, chartw = gwidth-(gutter*2), charth = gheight-vgutter;
 		chart = this[this.options.type](chartx, charty, chartw, charth, undefined, [data], this.options.chartOptions);
-		if(labels && this.type === 'barchart') {
-		    chart.label([this.options.labels], true, true);
+		if(labels && ((this.options.type === 'barchart') || (this.options.type === 'deviationbarchart'))) {
+		    chart.label([this.options.labels], true, -45);
 		}
-		
-		this.chart = {chart: chart, x: chartx, y: charty, w: chartw, h: charth};
+		if( this.options.type == 'barchart')
+    		this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(charty+charth-vgutter)+" L"+(chartw+chartx)+" "+(charty+charth-vgutter));
+    	else if( this.options.type == 'deviationbarchart' ) {
+    	    this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(((charty+charth)/2)+(vgutter/2)+1)+" L"+chartw+chartx+" "+((charty+charth)/2));
+    	} else if ( this.options.type == 'linechart' ) {
+    	    this.paper.g.axis(chartx+gutter, charty+charth-vgutter, chartw-(gutter*2), 0, data.length-1, data.length-1, undefined, this.options.labels, undefined, undefined, -45);
+    	}
+    	
+    	if(this.options.overlay.data !== {} ) {
+    	    // lets draw an overlay graph
+    	    if( this.options.overlay.type === 'linechart' ) {
+    	        if(this.options.type === 'barchart' || this.options.type === 'deviationbarchart') {
+    	            this.options.overlay.offset = (chart.bars[0][0].w)/2;
+    	        } else {
+    	            this.options.overlay.offset = 0;
+    	        }
+    	        this.options.overlay.chart = this[this.options.overlay.type](chartx+this.options.overlay.offset,charty,chartw-(this.options.overlay.offset*2),charth, undefined, [this.options.overlay.data], this.options.overlay.chartOptions);
+    	    }
+    	}
+    	chart.hover(this.hoverfin, this.hoverfout);
+    	this.chart = {chart: chart, x: chartx, y: charty, w: chartw, h: charth};
 	},
 	
 	draw: function(data) {
 	    if (!this.chart) return;
 	    this.chart.chart.remove();
 	    this.chart.chart = this[this.options.type](this.chart.x, this.chart.y, this.chart.w, this.chart.h, undefined, [data], this.options.chartOptions);
+	    if(this.options.overlay !== {}) {
+	        this.options.overlay.chart.toFront();
+	    }
+	    this.chart.chart.hover(this.hoverfin, this.hoverfout);
 	}
 });
 
 
-// Fuzzy Array Slicing
+// Fuzzy Array Slicing - Mootools Array Plugin
 (function(nil){
     Array.implement({
         fuzzyltrim: function(value, times) {
