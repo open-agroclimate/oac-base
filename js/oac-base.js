@@ -232,7 +232,7 @@ var OACGraph = new Class({
 		if( this.options.type == 'barchart') {
 		    if (this.options.min < 0) {
 		        var unith = (chart.bars[0][0].h)/(chart.bars[0][0].value),
-		            liney = Math.abs(this.options.min) * unith;
+		            liney = Math.abs(yfrom) * unith;
 		        this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(charty+charth-vgutter-liney)+" L"+(chartw+chartx)+" "+(charty+charth-vgutter-liney));
 	        } else {
         		this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(charty+charth-vgutter)+" L"+(chartw+chartx)+" "+(charty+charth-vgutter));
