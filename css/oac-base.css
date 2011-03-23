@@ -1,3 +1,25 @@
+#avg-deviation-table, #prob-dist-table, #prob-exceed-table, #five-year-table{
+	width: 620px;
+	border: 1px solid #ccc;
+	margin-left: 1px;
+	border-collapse: collapse !important;
+	border-top: 0px;
+}
+
+#avg-deviation-table th, #avg-deviation-table tr td, #prob-dist-table th, #prob-dist-table tr td, #prob-exceed-table th, #prob-exceed-table tr td, #five-year-table th, #five-year-table tr td{
+	padding: 8px 5px;
+	border: 1px solid #ccc;
+	
+}
+
+#avg-deviation-table th, #prob-dist-table th, #prob-exceed-table th, #five-year-table th{
+	border-top: 0px;
+	height: 25px;
+	background: transparent url(table_background.gif) 0 0 repeat;
+	font-weight: 700;
+} 
+
+
 li.oac-enso-1 {
 	background-color: #00ff66;
 }
@@ -38,6 +60,24 @@ table.oac-enso-4 .oac-data-selected {
     padding: 0;
 }
 
+ul#enso-select {
+	display: block;
+	clear:both;
+}
+
+#enso-select li{
+	width: 135px;
+	margin: 20px 10px 0 0;
+	padding: 5px;
+	display: inline-table;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	}
+
+#innerWrap ul#tabs{
+	margin-bottom: 0 !important;
+}
 #tabs li {
         cursor: pointer;
         float: left;
@@ -67,3 +107,8 @@ table.oac-enso-4 .oac-data-selected {
 .tabcontent.selected {
     display: block;
 }
+#oac-user-input-panel{
+	padding-top: 15px;
+}
+label {font-size: .8em; font-weight: 700;padding-right: 10px;width: 125px;}
+#oac_scope_location{padding: 5px 0;}
