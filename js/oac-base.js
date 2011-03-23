@@ -239,7 +239,7 @@ var OACGraph = new Class({
         	}
         }
     	else if( this.options.type == 'deviationbarchart' ) {
-    	    this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(((charty+charth)/2)+(vgutter/2)+1)+" L"+chartw+chartx+" "+((charty+charth)/2));
+    	    this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(((charty+charth)/2)+(vgutter/2)+1)+" L"+(chartw+chartx)+" "+(((charty+charth)/2)+(vgutter/2)+1));
     	} else if ( this.options.type == 'linechart' ) {
     	    this.paper.g.axis(chartx+gutter, charty+charth-vgutter, chartw-(gutter*2), 0, data.length-1, data.length-1, undefined, this.options.labels, undefined, undefined, -45);
     	}
