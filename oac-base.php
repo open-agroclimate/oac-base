@@ -45,7 +45,6 @@ class OACBase {
 		
 		// WP_Scoper
 		require_once( 'scoper/wp-scoper.php' );
-
 		// mootools
 		wp_register_script( 'mootools-core',         plugins_url( 'js/mootools/mootools-core.js',       __FILE__ ) );
 		wp_register_script( 'mootools',              plugins_url( 'js/mootools/mootools-more.js',       __FILE__ ), array( 'mootools-core' ) );
@@ -65,42 +64,46 @@ class OACBase {
 		// CSS styles registration
 		wp_register_style( 'oacbase',   plugins_url( 'css/oac-base.css', __FILE__ ) );
 		
+		$plugin_dir = basename( dirname( __FILE__ ) );
+		load_plugin_textdomain( 'oacbase', null, $plugin_dir . '/languages' );
+
+		
 		self::$units = array('Metric'=>array(
 				'smalllen'=>array(
-					'abbr' => __('mm'),
-					'name' => __('Millimeter')
+					'abbr' => __( 'mm', 'oacbase' ),
+					'name' => __( 'Millimeter', 'oacbase' )
 				),
 				'len' => array(
-					'abbr' => __('m'),
-					'name' => __('Meter'),
+					'abbr' => __('m', 'oacbase' ),
+					'name' => __('Meter', 'oacbase' ),
 				),
 				'largelen' => array(
-					'abbr' => __('km'),
-					'name' => __('Kilometer')
+					'abbr' => __('km', 'oacbase' ),
+					'name' => __('Kilometer', 'oacbase' )
 				),
 				'temp'=> array(
-					'abbr' => __('&#176;C'),
-					'name' => __('&#176;Celsius')
+					'abbr' => __('&#176;C', 'oacbase' ),
+					'name' => __('&#176;Celsius', 'oacbase' )
 				)
 			),
 			'US' => array(
 				'smalllen'=>array(
-					'abbr'   => __('in'),
-					'name'   => __('Inch'),
-					'plural' => __('Inches')
+					'abbr'   => __('in', 'oacbase' ),
+					'name'   => __('Inch', 'oacbase' ),
+					'plural' => __('Inches', 'oacbase' )
 				),
 				'len' => array(
-					'abbr'   => __('ft'),
-					'name'   => __('Foot'),
-					'plural' => __('Feet')
+					'abbr'   => __('ft', 'oacbase' ),
+					'name'   => __('Foot', 'oacbase' ),
+					'plural' => __('Feet', 'oacbase' )
 				),
 				'largelen' => array(
-					'abbr' => __('mi'),
-					'name' => __('Mile')
+					'abbr' => __('mi', 'oacbase' ),
+					'name' => __('Mile', 'oacbase' )
 				),
 				'temp' => array(
-					'abbr' => __('&#176;F'),
-					'name' => __('&$176;Fahrenheit')
+					'abbr' => __('&#176;F', 'oacbase' ),
+					'name' => __('&$176;Fahrenheit', 'oacbase' )
 				)
 			)
 		);
@@ -140,16 +143,16 @@ class OACBase {
 			$current_phase = array_search( max( $enso_array ), $enso_array );
 			switch( substr( $current_phase, 0, 1 ) ) {
 				case 'l': // La Nina Phase
-					$enso_array['current_phase'] = __( 'La Ni&#241;a' );
+					$enso_array['current_phase'] = __( 'La Ni&#241;a', 'oacbase'  );
 					break;
 				case 'n': // Neutral Phase
-					$enso_array['current_phase'] = __( 'Neutral' );
+					$enso_array['current_phase'] = __( 'Neutral', 'oacbase'  );
 					break;
 				case 'e': // El Nino Phase
-					$enso_array['current_phase'] = __( 'El Ni&#241;o' );
+					$enso_array['current_phase'] = __( 'El Ni&#241;o', 'oacbase'  );
 					break;
 				default:
-					$enso_array['current_phase'] = __( 'Unknown' );
+					$enso_array['current_phase'] = __( 'Unknown', 'oacbase'  );
 					break;
 			}
 		
@@ -209,11 +212,11 @@ class OACBase {
 	static public function display_enso_selector( $phases_only = false ) {
 		$current_phase_id = substr( self::get_current_enso_phase(), 0, 1 );
 		$output = '<ul id="enso-select">';
-		$output .= '<li class="neutral oac-enso-1"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral' ).'</li>';
-		$output .= '<li class="elnino oac-enso-2"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o' ).'</li>';
-		$output .= '<li class="lanina oac-enso-3"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a' ).'</li>';
+		$output .= '<li class="neutral oac-enso-1"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral', 'oacbase'  ).'</li>';
+		$output .= '<li class="elnino oac-enso-2"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o', 'oacbase'  ).'</li>';
+		$output .= '<li class="lanina oac-enso-3"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a', 'oacbase'  ).'</li>';
 		if ( ! $phases_only )
-			$output .= '<li class="allYears oac-enso-4"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4">'.__( 'All Years' ).'</li>';
+			$output .= '<li class="allYears oac-enso-4"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4">'.__( 'All Years', 'oacbase'  ).'</li>';
 		$output .= '</ul>';
 		return $output;
 	}
@@ -252,6 +255,8 @@ class OACBase {
 class OACBaseAdmin {
 	static public function init() {
 		OACBase::init();
+		$plugin_dir = basename( dirname( __FILE__ ) );
+		load_plugin_textdomain( 'oacbase', null, $plugin_dir . '/languages' );
 		self::admin_handler();
 	}
 	/**
@@ -297,7 +302,7 @@ class OACBaseAdmin {
 				case 'oacb_update_options':
 					check_admin_referer( 'update-base-options' );
 					update_option( 'oac_base_units', $_REQUEST['base_units'] );
-					echo '<div id="message" class="updated"><p><strong>'.__('Global Settings updated').'</strong></p></div>';
+					echo '<div id="message" class="updated"><p><strong>'.__('Global Settings updated', 'oacbase' ).'</strong></p></div>';
 					break;
 			}
 		}
