@@ -139,7 +139,7 @@ var OACGraph = new Class({
 				this.paper = this.options.linkedpaper = Raphael(this.element, this.options.width, this.options.height);
 			}
 		} else {
-			this.paper = Raphael(this.element, this.options.width, this.options.height);
+			this.paper = Raphael(this.element.getProperty('id'), this.options.width, this.options.height);
 		}
 	},
 	
@@ -156,8 +156,8 @@ var OACGraph = new Class({
 	redraw: function( data, displaylabels, labels, x, y, width, height ) {
 		x = x || 0;
 		y = y || 0;
-		width = width || this.paper.width;
-		height = height || this.paper.height;
+		width = width || this.options.width;
+		height = height || this.options.height;
 		displaylabels = displaylabels || false;
 		labels = labels || this.options.labels;
 		var	gutter  = this.options.chartOptions.gutter,
@@ -214,7 +214,7 @@ var OACGraph = new Class({
 		}
 		
 		// Draw the axis and shift everything right
-		var	yaxis   = this.paper.g.axis(startx+gutter, gheight+vgutter+2, gheight-vgutter, yfrom, yto, ysteps, 1 ),
+		var	yaxis   = this.paper.g.axis(startx+gutter, (starty <= 0) ? gheight : gheight+vgutter+2, gheight-vgutter, yfrom, yto, ysteps, 1 ),
 			yaxisbb = yaxis.all.getBBox();
 			yaxis.all.translate(yaxisbb.width/2, 0);
 			startx += yaxisbb.width;
@@ -223,8 +223,9 @@ var OACGraph = new Class({
 		gwidth -= startx;
 		gheight += (vgutter*2)+3;
 		
-		starty = starty - vgutter;
-		chartx = (this.options.type=='linechart') ? startx-(gutter/2)-2 : startx+gutter, charty = starty+vgutter/2, chartw = gwidth-(gutter*2), charth = gheight-vgutter;
+		starty = ((starty - vgutter) <= 0) ? 0 : starty-vgutter;
+		gheight = (starty == 0) ? gheight-vgutter+5 : gheight;
+		chartx = (this.options.type=='linechart') ? startx-(gutter/2)-2 : startx+gutter, charty = starty+(vgutter/2), chartw = gwidth-(gutter*2), charth = gheight-vgutter;
 		chart = this[this.options.type](chartx, charty, chartw, charth, undefined, [data], this.options.chartOptions);
 		if(labels && ((this.options.type === 'barchart') || (this.options.type === 'deviationbarchart'))) {
 		    chart.label([this.options.labels], true, -45);

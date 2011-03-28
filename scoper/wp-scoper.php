@@ -8,7 +8,7 @@ class WPScoper {
 	public $scope; // Scope container
 	public $filtered; // Marker to show this is a filtered scope
 	
-	public function __construct( $scope_name, $autoload = true, $filter = null ) {
+	public function __construct( $scope_name, $filter = null, $autoload = true  ) {
 		if( substr( $scope_name, 0, 10 ) != 'oac_scope_' )
 			$scope_name = 'oac_scope_'.$scope_name;
 		$this->name  = str_replace('-', '_', sanitize_title_with_dashes( $scope_name ) );
@@ -26,6 +26,7 @@ class WPScoper {
 	 * erase your data.
 	 */
 	private function filter_scope( $filter=array() ) {
+	  if( count( $filter ) == 0 ) return false; // No need to run if you are blank dear
 		for( $i = 0; $i < count( $filter ); $i++ ) {
 			$lineage = '';
 			$heratage = explode('_', $filter[$i]);
@@ -41,8 +42,8 @@ class WPScoper {
 				}
 			}
 		}
-		$remove = array_diff_key( $this->scope->data, $filter );
-		if( count($remove) == count( $this->scope->data ) ) {
+		$remove = array_diff( array_keys( $this->scope->data ), $filter );
+		if( count( $remove ) == count( $this->scope->data ) ) {
 			return false;
 		}
 		$remove = array_keys( $remove );

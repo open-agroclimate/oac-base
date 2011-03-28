@@ -132,7 +132,7 @@ class WPDBScopeLoader {
 
 
 $test = new WPDBScopeLoader('location_py');
-$test->addField( 'Departamento_name', 'county' );
+$test->addField( 'Ubicación_nombre', 'location' );
 $test->generateScope( 'location' );
 
 $wpscope = new WPScoper( 'location' );
@@ -140,5 +140,5 @@ $wpscope->scope = $test->scope;
 $wpscope->save();
 
 // EVIL HARDCODE
-print_r( $wpcope );
+print_r( $wpscope );
 ?>
