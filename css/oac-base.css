@@ -56,6 +56,10 @@ ul#enso-select {
 #innerWrap ul#tabs{
 	margin-bottom: 0 !important;
 }
+
+ul#tabs{
+	border-bottom-width: 0px;
+}
 #tabs li {
         cursor: pointer;
         float: left;
@@ -88,6 +92,22 @@ ul#enso-select {
 	padding-top: 15px;
 }
 
-label {font-size: .8em; font-weight: 700;padding-right: 10px;width: 125px;}
+label {font-size: .8em; font-weight: 700;padding-right: 15px;}
 
 #oac_scope_location{padding: 5px 0;}
+
+.tableWrap{
+	max-height: 250px;
+	overflow: auto;
+	padding-right: 15px;
+}
+
+.oac-table{
+	padding:0;
+}
+
+.oac-chart{
+	width: 620px !important;
+	margin-top: 25px;
+	border: 1px #ccc solid;
+}
