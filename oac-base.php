@@ -302,6 +302,8 @@ class OACBaseAdmin {
 				case 'oacb_update_options':
 					check_admin_referer( 'update-base-options' );
 					update_option( 'oac_base_units', $_REQUEST['base_units'] );
+                    update_option( 'oac_display_enso', $_REQUEST['ensophase'] );
+                    update_option( 'oac_display_enso_text', $_REQUEST['ensotext'] );
 					echo '<div id="message" class="updated"><p><strong>'.__('Global Settings updated', 'oacbase' ).'</strong></p></div>';
 					break;
 			}
@@ -309,27 +311,40 @@ class OACBaseAdmin {
 	}
 
 	static public function admin_page() {
-		$base_units = get_option('oac_base_units', 'Metric' );
+        $base_units = get_option( 'oac_base_units', 'Metric' );
+        $ensophase  = get_option( 'oac_display_enso', 'N' );
+        $ensotext   = get_option( 'oac_display_enso_text', '' );
 	?>
 		<div class="wrap">
 			<?php screen_icon( 'tools' ); ?>
-			<h2>Open AgroClimate: Global Settings</h2>
-			<h3>Units</h3>
-			<p>Please choose the standard unit of measurement used by your data.<br>
-			<form action="<?php echo esc_attr( $_SERVER['REQUEST_URI'] ); ?>" method="POST">
-				<?php wp_nonce_field( 'update-base-options' ); ?>
-				<input type="hidden" name="action" value="oacb_update_options">
-				<label for="base_units">Units in: </label>
-				<select id="base_units" name="base_units">
-				<?php 
-					foreach( array_keys( OACBase::$units ) as $key ) {
-						echo "<option value=\"{$key}\"".($base_units == $key ? " selected" : "").">{$key}</option>";
-					}
-				?>
-				</select>
-				<p><input type="submit" class="button" value="Update Settings" /></p>
-			</form>
-			
+        <h2><?php _e( 'Open AgroClimate: Global Settings', 'oacbase' ); ?></h2>
+        <form action="<?php echo esc_attr( $_SERVER['REQUEST_URI'] ); ?>" method="POST">
+            <h3><?php _e( 'Units', 'oacbase' ); ?></h3>
+            <p><?php _e( 'Please choose the standard unit of measurement used by your data.', 'oacbase' );?><br>
+            <?php wp_nonce_field( 'update-base-options' ); ?>
+            <input type="hidden" name="action" value="oacb_update_options">
+            <label for="base_units"><?php _e( 'Units in:', 'oacbase' ); ?> </label>
+            <select id="base_units" name="base_units">
+            <?php 
+                foreach( array_keys( OACBase::$units ) as $key ) {
+                    echo "<option value=\"{$key}\"".($base_units == $key ? " selected" : "").">{$key}</option>";
+                }
+            ?>
+            </select>
+            </p>
+            <hr>
+            <h3><?php _e( 'Current ENSO Phase', 'oacbase' ); ?></h3>
+            <p><?php _e( 'Please select the current ENSO phase to display, along with any text', 'oacbase' );?><br>
+            <label for="ensophase"><?php _e( 'ENSO Phase', 'oacbase' ); ?>: </label><br>
+            <select id="ensophase" name="ensophase">
+                <option value="N" <?php echo( ( substr( $ensophase, 0, 1 ) == 'N' ) ? "selected" : ""); ?>><?php _e( 'Neutral', 'oacbase' ); ?></option>
+                <option value="E" <?php echo( ( substr( $ensophase, 0, 1 ) == 'E' ) ? "selected" : ""); ?>><?php _e( 'El Ni&#241;o', 'oacbase' ); ?></option>
+                <option value="L" <?php echo( ( substr( $ensophase, 0, 1 ) == 'L' ) ? "selected" : ""); ?>><?php _e( 'La Ni&#241;a', 'oacbase' ); ?></option>
+            </select></div></p>
+            <div><label for="ensotext"><?php _e( 'ENSO Phase Description', 'oacbase' ); ?>: </label><br>
+            <input type="text" id="ensotext" name="ensotext" size=60 value="<?php echo $ensotext; ?>"></div>
+            <p><input type="submit" class="button" value="Update Settings" /></p>
+        </form>
 		</div>
 	<?php
 	}

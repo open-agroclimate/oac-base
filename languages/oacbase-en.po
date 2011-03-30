@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Open AgroClimate Base Plugin \n"
+"Project-Id-Version: Open AgroClimate Base Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-28 14:13-0500\n"
-"PO-Revision-Date: 2011-03-28 14:15-0500\n"
+"POT-Creation-Date: 2011-03-30 16:40-0500\n"
+"PO-Revision-Date: 2011-03-30 16:50-0500\n"
 "Last-Translator: Christopher Villalobos <cvillalobos@ufl.edu>\n"
 "Language-Team: Open AgroClimate Project <open@agroclimate.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,3 +17,235 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
+
+#: ../oac-base.php:73
+msgid "mm"
+msgstr "mm"
+
+#: ../oac-base.php:74
+msgid "Millimeter"
+msgstr "Millimeter"
+
+#: ../oac-base.php:77
+msgid "m"
+msgstr "m"
+
+#: ../oac-base.php:78
+msgid "Meter"
+msgstr "Meter"
+
+#: ../oac-base.php:81
+msgid "km"
+msgstr "km"
+
+#: ../oac-base.php:82
+msgid "Kilometer"
+msgstr "Kilometer"
+
+#: ../oac-base.php:85
+msgid "&#176;C"
+msgstr "&#176;C"
+
+#: ../oac-base.php:86
+msgid "&#176;Celsius"
+msgstr "&#176;Celsius"
+
+#: ../oac-base.php:91
+msgid "in"
+msgstr "in"
+
+#: ../oac-base.php:92
+msgid "Inch"
+msgstr "Inch"
+
+#: ../oac-base.php:93
+msgid "Inches"
+msgstr "Inches"
+
+#: ../oac-base.php:96
+msgid "ft"
+msgstr "ft"
+
+#: ../oac-base.php:97
+msgid "Foot"
+msgstr "Foot"
+
+#: ../oac-base.php:98
+msgid "Feet"
+msgstr "Feet"
+
+#: ../oac-base.php:101
+msgid "mi"
+msgstr "mi"
+
+#: ../oac-base.php:102
+msgid "Mile"
+msgstr "Mile"
+
+#: ../oac-base.php:105
+msgid "&#176;F"
+msgstr "&#176;F"
+
+#: ../oac-base.php:106
+msgid "&$176;Fahrenheit"
+msgstr "&$176;Fahrenheit"
+
+#: ../oac-base.php:146
+#: ../oac-base.php:217
+#: ../oac-base.php:341
+msgid "La Ni&#241;a"
+msgstr "La Ni&#241;a"
+
+#: ../oac-base.php:149
+#: ../oac-base.php:215
+#: ../oac-base.php:339
+msgid "Neutral"
+msgstr "Neutral"
+
+#: ../oac-base.php:152
+#: ../oac-base.php:216
+#: ../oac-base.php:340
+msgid "El Ni&#241;o"
+msgstr "El Ni&#241;o"
+
+#: ../oac-base.php:155
+msgid "Unknown"
+msgstr "Unknown"
+
+#: ../oac-base.php:219
+msgid "All Years"
+msgstr "All Years"
+
+#: ../oac-base.php:307
+msgid "Global Settings updated"
+msgstr "Global Settings updated"
+
+#: ../oac-base.php:320
+msgid "Open AgroClimate: Global Settings"
+msgstr "Open AgroClimate: Global Settings"
+
+#: ../oac-base.php:322
+msgid "Units"
+msgstr "Units"
+
+#: ../oac-base.php:323
+msgid "Please choose the standard unit of measurement used by your data."
+msgstr "Please choose the standard unit of measurement used by your data."
+
+#: ../oac-base.php:326
+msgid "Units in:"
+msgstr "Units in:"
+
+#: ../oac-base.php:335
+msgid "Current ENSO Phase"
+msgstr "Current ENSO Phase"
+
+#: ../oac-base.php:336
+msgid "Please select the current ENSO phase to display, along with any text"
+msgstr "Please select the current ENSO phase to display, along with any text"
+
+#: ../oac-base.php:337
+msgid "ENSO Phase"
+msgstr "ENSO Phase"
+
+#: ../oac-base.php:343
+msgid "ENSO Phase Description:"
+msgstr "ENSO Phase Description:"
+
+#: ../scoper/wp-scoper-admin.php:7
+msgid "You do not have sufficient permission to access this page."
+msgstr "You do not have sufficient permission to access this page."
+
+#: ../scoper/wp-scoper-admin.php:26
+msgid "The requested scope does not exists."
+msgstr "The requested scope does not exists."
+
+#: ../scoper/wp-scoper-admin.php:33
+msgid " Invalid request"
+msgstr " Invalid request"
+
+#: ../scoper/wp-scoper-admin.php:37
+#: ../scoper/wp-scoper-admin.php:83
+msgid "You are improperly attempting to edit a scope"
+msgstr "You are improperly attempting to edit a scope"
+
+#: ../scoper/wp-scoper-admin.php:44
+#: ../scoper/wp-scoper-admin.php:89
+msgid "The requested scope does not exist."
+msgstr "The requested scope does not exist."
+
+#: ../scoper/wp-scoper-admin.php:51
+msgid "This scope is still in use."
+msgstr "This scope is still in use."
+
+#: ../scoper/wp-scoper-admin.php:56
+msgid "Scope has been successfully removed"
+msgstr "Scope has been successfully removed"
+
+#: ../scoper/wp-scoper-admin.php:59
+msgid "The requested scope does not exist"
+msgstr "The requested scope does not exist"
+
+#: ../scoper/wp-scoper-admin.php:62
+msgid "You are improperly attempting to remove a scope"
+msgstr "You are improperly attempting to remove a scope"
+
+#: ../scoper/wp-scoper-admin.php:79
+msgid "Scopes"
+msgstr "Scopes"
+
+#: ../scoper/wp-scoper-admin.php:99
+msgid "Load Scope From CSV File"
+msgstr "Load Scope From CSV File"
+
+#: ../scoper/wp-scoper-admin.php:117
+#: ../scoper/wp-scoper-admin.php:123
+msgid "Name"
+msgstr "Name"
+
+#: ../scoper/wp-scoper-admin.php:118
+#: ../scoper/wp-scoper-admin.php:124
+msgid "Used For"
+msgstr "Used For"
+
+#: ../scoper/wp-scoper-admin.php:132
+msgid "No scopes installed"
+msgstr "No scopes installed"
+
+#: ../scoper/wp-scoper-admin.php:146
+msgid "Not used"
+msgstr "Not used"
+
+#: ../scoper/wp-scoper-admin.php:153
+msgid "Edit this scope"
+msgstr "Edit this scope"
+
+#: ../scoper/wp-scoper-admin.php:153
+msgid "Edit"
+msgstr "Edit"
+
+#: ../scoper/wp-scoper-admin.php:155
+msgid "Remove this scope"
+msgstr "Remove this scope"
+
+#: ../scoper/wp-scoper-admin.php:155
+msgid "Remove"
+msgstr "Remove"
+
+#: ../scoper/wp-scoper-admin.php:212
+msgid "You do not have permissions to perform this action or have called it improperly."
+msgstr "You do not have permissions to perform this action or have called it improperly."
+
+#: ../scoper/wp-scoper.php:88
+msgid "The CSV file could not be found. Please contact the system administrator."
+msgstr "The CSV file could not be found. Please contact the system administrator."
+
+#: ../scoper/wp-scoper.php:94
+#: ../scoper/wp-scoper.php:103
+msgid "The following error(s) have occured during processing:"
+msgstr "The following error(s) have occured during processing:"
+
+#: ../scoper/wp-scoper.php:114
+msgid "There was a problem updating the scope. Please try overwriting the scope by unchecking Append"
+msgstr "There was a problem updating the scope. Please try overwriting the scope by unchecking Append"
+

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Open AgroClimate Base Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-28 14:43-0500\n"
-"PO-Revision-Date: 2011-03-28 14:44-0500\n"
+"POT-Creation-Date: 2011-03-30 16:54-0500\n"
+"PO-Revision-Date: 2011-03-30 16:54-0500\n"
 "Last-Translator: Christopher Villalobos <cvillalobos@ufl.edu>\n"
 "Language-Team: Open AgroClimate Project <open@agroclimate.org>\n"
 "MIME-Version: 1.0\n"
@@ -92,16 +92,19 @@ msgstr ""
 
 #: ../oac-base.php:146
 #: ../oac-base.php:217
+#: ../oac-base.php:342
 msgid "La Ni&#241;a"
 msgstr ""
 
 #: ../oac-base.php:149
 #: ../oac-base.php:215
+#: ../oac-base.php:340
 msgid "Neutral"
 msgstr ""
 
 #: ../oac-base.php:152
 #: ../oac-base.php:216
+#: ../oac-base.php:341
 msgid "El Ni&#241;o"
 msgstr ""
 
@@ -113,8 +116,40 @@ msgstr ""
 msgid "All Years"
 msgstr ""
 
-#: ../oac-base.php:305
+#: ../oac-base.php:307
 msgid "Global Settings updated"
+msgstr ""
+
+#: ../oac-base.php:320
+msgid "Open AgroClimate: Global Settings"
+msgstr ""
+
+#: ../oac-base.php:322
+msgid "Units"
+msgstr ""
+
+#: ../oac-base.php:323
+msgid "Please choose the standard unit of measurement used by your data."
+msgstr ""
+
+#: ../oac-base.php:326
+msgid "Units in:"
+msgstr ""
+
+#: ../oac-base.php:336
+msgid "Current ENSO Phase"
+msgstr ""
+
+#: ../oac-base.php:337
+msgid "Please select the current ENSO phase to display, along with any text"
+msgstr ""
+
+#: ../oac-base.php:338
+msgid "ENSO Phase"
+msgstr ""
+
+#: ../oac-base.php:344
+msgid "ENSO Phase Description"
 msgstr ""
 
 #: ../scoper/wp-scoper-admin.php:7
