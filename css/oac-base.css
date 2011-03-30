@@ -92,7 +92,7 @@ ul#tabs{
 	padding-top: 15px;
 }
 
-label {font-size: .8em; font-weight: 700;padding-right: 15px;}
+label {font-size: .8em; font-weight: 700; margin: 5px 0; display: block;}
 
 #oac_scope_location{padding: 5px 0;}
 
