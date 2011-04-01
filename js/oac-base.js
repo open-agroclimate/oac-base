@@ -225,7 +225,7 @@ var OACGraph = new Class({
 		
 		starty = ((starty - vgutter) <= 0) ? 0 : starty-vgutter;
 		gheight = (starty == 0) ? gheight-vgutter+5 : gheight;
-		chartx = (this.options.type=='linechart') ? startx-(gutter/2)-2 : startx+gutter, charty = starty+(vgutter/2), chartw = gwidth-(gutter*2), charth = gheight-vgutter;
+		chartx = (this.options.type=='linechart' || this.options.type=='undeflinechart') ? startx-(gutter/2)-2 : startx+gutter, charty = starty+(vgutter/2), chartw = gwidth-(gutter*2), charth = gheight-vgutter;
 		chart = this[this.options.type](chartx, charty, chartw, charth, undefined, [data], this.options.chartOptions);
 		if(labels && ((this.options.type === 'barchart') || (this.options.type === 'deviationbarchart'))) {
 		    chart.label([this.options.labels], true, -45);
@@ -241,7 +241,7 @@ var OACGraph = new Class({
         }
     	else if( this.options.type == 'deviationbarchart' ) {
     	    this.paper.path("M"+(chartx-(gutter/2)-3)+" "+(((charty+charth)/2)+(vgutter/2)+1)+" L"+(chartw+chartx)+" "+(((charty+charth)/2)+(vgutter/2)+1));
-    	} else if ( this.options.type == 'linechart' ) {
+    	} else if ( this.options.type == 'linechart' || this.options.type == 'undeflinechart' ) {
     	    this.paper.g.axis(chartx+gutter, charty+charth-vgutter, chartw-(gutter*2), 0, data.length-1, data.length-1, undefined, this.options.labels, undefined, undefined, -45);
     	}
     	
@@ -256,7 +256,13 @@ var OACGraph = new Class({
     	        this.options.overlay.chart = this[this.options.overlay.type](chartx+this.options.overlay.offset,charty,chartw-(this.options.overlay.offset*2),charth, undefined, [this.options.overlay.data], this.options.overlay.chartOptions);
     	    }
     	}
-    	chart.hover(this.hoverfin, this.hoverfout);
+        if( typeOf(chart) === 'array' ) {
+            for( var i = 0, l = chart.length; i < l; i++ ) {
+                chart[i].hover(this.hoverfin, this.hoverfout);
+            }
+        } else {
+            chart.hover(this.hoverfin, this.hoverfout);
+        }
     	this.chart = {chart: chart, x: chartx, y: charty, w: chartw, h: charth};
 	},
 	

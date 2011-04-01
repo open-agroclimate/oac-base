@@ -54,9 +54,10 @@ class OACBase {
 		// raphaeljs/gRapahel script setup.
 		wp_register_script( 'raphaeljs', plugins_url( 'js/raphael.js', __FILE__ ) );
 		wp_register_script( 'graphael',  plugins_url( 'js/graphael/g.raphael.js', __FILE__ ), array( 'raphaeljs' ) );
-		wp_register_script( 'grpie',     plugins_url( 'js/graphael/g.pie.js', __FILE__ ),     array( 'graphael') );
+		wp_register_script( 'grpie',     plugins_url( 'js/graphael/g.pie.js', __FILE__ ),     array( 'graphael' ) );
 		wp_register_script( 'grbar',     plugins_url( 'js/graphael/g.bar.js', __FILE__),      array( 'graphael' ) );
 		wp_register_script( 'grline',    plugins_url( 'js/graphael/g.line.js', __FILE__),     array( 'graphael' ) );
+        wp_register_script( 'grdot',     plugins_url( 'js/graphael/g.dot.js', __FILE__),      array( 'graphael' ) );
 		//wp_register_script( 'oaclib',    plugins_url( 'js/oaclib.js', __FILE__ ), array( 'jquery','graphael' ) );
 		wp_register_script( 'oac-base',      plugins_url( 'js/oac-base.js',      __FILE__ ),  array( 'mootools' ) );
 		wp_register_script( 'oac-barchart',  plugins_url( 'js/oac-barchart.js',  __FILE__ ),  array( 'oac-base', 'grbar' ) );
