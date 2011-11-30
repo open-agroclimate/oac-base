@@ -39,13 +39,21 @@ class WPDBScopeLoader {
 				$this->source_table = $source_table;
 			}
 		}
+		$this->scope->extra['loader']        = __CLASS__;
+		$this->scope->extra['table']         = $this->source_table;
 		$this->set_source_columns();
+		$this->scope->extra['source_cols']   = $this->get_source_columns();
 	}
 
+	private static function column_filter( $var ) {
+		return ( substr( $var, 0, 9) == 'oac_scope' ) ? false : true;
+	}
+	
 	private function set_source_columns() {
 		if ( is_null( $this->source_table ) ) return false;
 		$this->db->query( "SELECT * FROM {$this->source_table} LIMIT 1" );
-		$this->source_columns = $this->db->get_col_info();
+		//$this->source_columns = $this->db->get_col_info();
+		$this->source_columns = array_filter( $this->db->get_col_info(), 'WPDBScopeLoader::column_filter' );
 	}
 
 	public function get_source_columns() {
@@ -78,6 +86,7 @@ class WPDBScopeLoader {
 		}
 		$this->field_listing[$title][] = $field;
 		$this->mapped_fields[$field] = $column_name;
+		$this->scope->extra['column_map'][$title.'|'.$field] = $column_name;
 	}
 
 
@@ -122,7 +131,7 @@ class WPDBScopeLoader {
 					$update_row[$this->mapped_fields[$field]] = $item[$this->mapped_fields[$field]]; 
 					$current_title[$field] = $item[$this->mapped_fields[$field]];
 				}
-				print_r( $update_row );
+				//print_r( $update_row );
 				$parent = $this->scope->add_node( $parent, $current_title, false ); 
 			}
 			$this->db->update($this->source_table, array( "oac_scope_{$scope_name}_id" => $parent ), $update_row, array( '%s' ) );
@@ -130,15 +139,14 @@ class WPDBScopeLoader {
 	}
 }
 
-
+/*
 $test = new WPDBScopeLoader('location_py');
 $test->addField( 'Ubicación_nombre', 'location' );
 $test->generateScope( 'location' );
-
 $wpscope = new WPScoper( 'location' );
 $wpscope->scope = $test->scope;
 $wpscope->save();
 
-// EVIL HARDCODE
-print_r( $wpscope );
+//// EVIL HARDCODE
+print_r( $wpscope ); //*/
 ?>

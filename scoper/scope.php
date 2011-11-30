@@ -12,6 +12,7 @@ class Scope {
 	public $meta;
 	public $index;
 	public $data;
+	public $extra;
 
 	public function Scope( $scope=null ) {
 		$this->__construct();		
@@ -24,10 +25,11 @@ class Scope {
 				$this->meta = $scope->meta;
 				$this->index = $scope->index;
 				$this->data = $scope->data;
+				$this->extra = $scope->extra;
 				return;
 			}
 		}
-		$this->errors = $this->meta = $this->index = $this->data = array();
+		$this->errors = $this->meta = $this->index = $this->data = $this->extra = array();
 	}
 
 	public function is_duplicate( $data, $parent = '', $unique_in_scope = false ) {
