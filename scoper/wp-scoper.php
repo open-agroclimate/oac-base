@@ -134,7 +134,7 @@ class WPScoper {
 		return $options;
 	}
 
-	public function generateDDL( $path='', $display_label=false, $hook='' ) {
+	public function generateDDL( $path='', $display_label=false, $display_string='', $hook='' ) {
 		// Time constrained - JS only
 		$dropdown = '';
 		if( isset( $this->scope->meta[ $this->scope->get_depth( $path ) ] ) ) {
@@ -153,7 +153,7 @@ class WPScoper {
 		return $dropdown;
 	}
 
-	public function generateNestedDDL( $starting_path='', $display_label=false ) {
+	public function generateNestedDDL( $starting_path='', $display_label=false, $display_string='' ) {
 		$nested = '<div id="'.$this->name.'">';
 		$children = $this->scope->get_children( $starting_path );
 		if( count( $children != 0 ) ) {

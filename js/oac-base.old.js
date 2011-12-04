@@ -46,7 +46,7 @@ var OACScope = new Class({
 	Implements: [Options],
 	
 	options: {
-		handler     : (($$('script[src*="oac-base.js"]')[0].getProperty('src').toURI().get('directory'))+'../scoper/wp-scoper-ajax.php').toURI().toString(),
+		handler     : (($$('script[src*="oac-base.old.js"]')[0].getProperty('src').toURI().get('directory'))+'../scoper/wp-scoper-ajax.php').toURI().toString(),
 		scope       : '',
 		element     : null,
 		parentClass : '.wp-scope-linked',

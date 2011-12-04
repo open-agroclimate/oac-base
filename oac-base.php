@@ -47,17 +47,33 @@ class OACBase {
     require_once( 'scoper/wp-scoper.php' );
     // underscore.js
     wp_register_script( 'underscore', plugins_url( 'js/underscore-min.js', __FILE__ ) );
+    
+    //YUI Library
+    wp_register_script( 'yui', plugins_url( 'js/yui/yui/yui-min.js', __FILE__ ) );
+
+    // mootools
+    wp_register_script( 'mootools-core',         plugins_url( 'js/mootools/mootools-core.js',       __FILE__ ) );
+    wp_register_script( 'mootools',              plugins_url( 'js/mootools/mootools-more.js',       __FILE__ ), array( 'mootools-core' ) );
+    wp_register_script( 'mootools-array-math',   plugins_url( 'js/mootools/Array.Math.js',          __FILE__ ), array( 'mootools-core' ) );
+    wp_register_script( 'mootools-table-colsel', plugins_url( 'js/mootools/HtmlTable.ColSelect.js', __FILE__ ), array( 'mootools' ) );
 
     // raphaeljs/gRapahel script setup.
     wp_register_script( 'raphaeljs',     plugins_url( 'js/graphael/raphael-min.js', __FILE__ ) );
+    wp_register_script( 'raphaeljs-old', plugins_url( 'js/graphael/old/raphael-min.js', __FILE__ ) );
     wp_register_script( 'graphael',      plugins_url( 'js/graphael/g.raphael.js', __FILE__ ), array( 'raphaeljs' ) );
     wp_register_script( 'grpie',         plugins_url( 'js/graphael/g.pie.js', __FILE__ ),   array( 'graphael' ) );
     wp_register_script( 'grbar',         plugins_url( 'js/graphael/g.bar.js', __FILE__),    array( 'graphael' ) );
     wp_register_script( 'grline',        plugins_url( 'js/graphael/g.line.js', __FILE__),   array( 'graphael' ) );
     wp_register_script( 'grdot',         plugins_url( 'js/graphael/g.dot.js', __FILE__),    array( 'graphael' ) );
+    wp_register_script( 'graphael-old',  plugins_url( 'js/graphael/old/g.raphael.js', __FILE__ ), array( 'raphaeljs-old' ) );
+    wp_register_script( 'grpie-old',     plugins_url( 'js/graphael/old/g.pie.js', __FILE__ ),   array( 'graphael-old' ) );
+    wp_register_script( 'grbar-old',     plugins_url( 'js/graphael/old/g.bar.js', __FILE__),    array( 'graphael-old' ) );
+    wp_register_script( 'grline-old',    plugins_url( 'js/graphael/old/g.line.js', __FILE__),   array( 'graphael-old' ) );
+    wp_register_script( 'grdot-old',     plugins_url( 'js/graphael/old/g.dot.js', __FILE__),    array( 'graphael-old' ) );
     wp_register_script( 'oac-base',      plugins_url( 'js/oac-base.js',    __FILE__ ),  array( 'jquery' ) );
-    wp_register_script( 'oac-barchart',  plugins_url( 'js/oac-barchart.js',  __FILE__ ),  array( 'oac-base', 'grbar' ) );
-    wp_register_script( 'oac-linechart', plugins_url( 'js/oac-linechart.js', __FILE__ ),  array( 'oac-base', 'grline' ) );
+    wp_register_script( 'oac-base-old',  plugins_url( 'js/oac-base.old.js', __FILE__ ), array( 'mootools' ) );
+    wp_register_script( 'oac-barchart',  plugins_url( 'js/oac-barchart.js',  __FILE__ ),  array( 'oac-base-old', 'grbar-old' ) );
+    wp_register_script( 'oac-linechart', plugins_url( 'js/oac-linechart.js', __FILE__ ),  array( 'oac-base-old', 'grline-old' ) );
 
     // CSS styles registration
     wp_register_style( 'oacbase',     plugins_url( 'css/oac-base.css', __FILE__ ) );
@@ -209,11 +225,11 @@ class OACBase {
   static public function display_enso_selector( $phases_only = false ) {
     $current_phase_id = substr( self::get_current_enso_phase(), 0, 1 );
     $output = '<label for="enso-select">Climate Phase</label><ul id="enso-select">';
-    $output .= '<li class="neutral oac-enso-1"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'>'.__( 'Neutral', 'oacbase'  ).'</li>';
-    $output .= '<li class="elnino oac-enso-2"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'>'.__( 'El Ni&#241;o', 'oacbase'  ).'</li>';
-    $output .= '<li class="lanina oac-enso-3"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'>'.__( 'La Ni&#241;a', 'oacbase'  ).'</li>';
+    $output .= '<li class="neutral oac-enso-1"><input type="radio" class="oac-input oac-radio" name="ensophase" value="1"'.(($current_phase_id == 'N') ? ' checked' : '').'><span class="ensotext">'.__( 'Neutral', 'oacbase'  ).'</span></li>';
+    $output .= '<li class="elnino oac-enso-2"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="2"'.(($current_phase_id == 'E') ? ' checked' : '').'><span class="ensotext">'.__( 'El Ni&#241;o', 'oacbase'  ).'</span></li>';
+    $output .= '<li class="lanina oac-enso-3"> <input type="radio" class="oac-input oac-radio" name="ensophase" value="3"'.(($current_phase_id == 'L') ? ' checked' : '').'><span class="ensotext">'.__( 'La Ni&#241;a', 'oacbase'  ).'</span></li>';
     if ( ! $phases_only )
-      $output .= '<li class="allYears oac-enso-4"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4">'.__( 'All Years', 'oacbase'  ).'</li>';
+      $output .= '<li class="allYears oac-enso-4"><input type="radio" class="oac-input oac-radio" name="ensophase" value="4"><span class="ensotext">'.__( 'All Years', 'oacbase'  ).'</span></li>';
     $output .= '</ul>';
     return $output;
   }

@@ -12,15 +12,15 @@ require_once( 'scope.php' );
 // Temporary until FE completed
 require_once( 'wp-scoper.php' );
 
-$filter_name = 'location_climaterisk';
-$filter_array = array( '3', '6', '8', '10', '20' );
+$filter_name = 'location_yieldrisk';
+$filter_array = array( '10', '22', '23' );
 
 $filter = get_option( 'oac_scope_filters', array() );
 
-//$filter[$filter_name] = $filter_array;
-//
-//print_r( $filter );
-//update_option( 'oac_scope_filters', $filter );
+$filter[$filter_name] = $filter_array;
+
+print_r( $filter );
+update_option( 'oac_scope_filters', $filter );
 //
 
 

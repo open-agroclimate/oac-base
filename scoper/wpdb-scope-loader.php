@@ -87,6 +87,7 @@ class WPDBScopeLoader {
 		$this->field_listing[$title][] = $field;
 		$this->mapped_fields[$field] = $column_name;
 		$this->scope->extra['column_map'][$title.'|'.$field] = $column_name;
+		print_r( $this );
 	}
 
 
@@ -139,14 +140,28 @@ class WPDBScopeLoader {
 	}
 }
 
-/*
-$test = new WPDBScopeLoader('location_py');
-$test->addField( 'Ubicación_nombre', 'location' );
-$test->generateScope( 'location' );
-$wpscope = new WPScoper( 'location' );
+
+$test = new WPDBScopeLoader( 'cropvariety_py' );
+$test->addField( 'Cultivo_cnombre', 'crop' );
+$test->addField( 'Variedad_vnombre', 'variety' );
+$test->generateScope( 'cropvariety' );
+print_r( $test->scope );
+$wpscope = new WPScoper( 'cropvariety' );
 $wpscope->scope = $test->scope;
 $wpscope->save();
+// 
+// // $test = new WPDBScopeLoader('location_py');
+// // $test->addField( 'Ubicación_nombre', 'location' );
+// // $test->generateScope( 'location' );
+// // //print_r( $test->scope );
+// // $wpscope = new WPScoper( 'location' );
+// // $wpscope->scope = $test->scope;
+// // $wpscope->save();
+// 
+// //// EVIL HARDCODE
+// print_r( $wpscope );
+$wpscope = new WPScoper( 'cropvariety' );
+echo $wpscope->generateNestedDDL( '', true );
 
-//// EVIL HARDCODE
-print_r( $wpscope ); //*/
+
 ?>
